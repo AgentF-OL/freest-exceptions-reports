@@ -1,0 +1,250 @@
+\documentclass[a4paper,11pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{palatino} % times is boring (but more concise)
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{listingsutf8}
+\usepackage{amssymb}
+\usepackage{enumitem}
+\usepackage{mathpartir}
+\usepackage{cleveref}
+\usepackage{xspace}
+
+\usepackage[most]{tcolorbox}
+\usepackage{environ}
+\usepackage{changepage}   % for the adjustwidth environment
+\usepackage[thmmarks,amsmath]{ntheorem}
+
+\usepackage{fontawesome7} % for zap icon
+%\usepackage[cal=mma]{mathalpha}
+\usepackage{upgreek}
+\usepackage{scalerel}
+
+\usepackage[a4paper, left=2.4cm, right=2.4cm, top=2.4cm, bottom=2.4cm]{geometry}
+
+% Align
+\NewEnviron{complexalign}
+  {
+    \scalebox{0.6}{\parbox{0.9\textwidth}{
+      \begin{align*}
+        \BODY
+      \end{align*}
+    }}
+  }
+
+% Derivation
+\NewEnviron{derivation}
+  {
+    \scalebox{0.3}{\parbox{0.6\textwidth}{
+      \begin{adjustwidth}{-10cm}{-25cm}
+        \begin{mathpar}
+          \BODY
+        \end{mathpar}
+      \end{adjustwidth}
+    }}
+  }
+
+\newcommand{\zap}{\text{\faBoltLightning}}
+
+\newcommand{\un}{\text{un}}
+\newcommand{\lin}{\text{lin}}
+\newcommand{\Skip}{\text{Skip}}
+\newcommand{\fn}{\text{fn}}
+
+\newcommand{\mbf}[1]{\mathbf{#1}}
+\newcommand{\channel}{\mbf{channel}}
+\newcommand{\fork}{\mbf{fork}}
+\newcommand{\forkWith}{\mbf{forkWith}}
+\newcommand{\send}{\mbf{send}}
+\newcommand{\receive}{\mbf{receive}}
+\newcommand{\close}{\mbf{close}}
+\newcommand{\wait}{\mbf{wait}}
+\newcommand{\sendType}{\mbf{sendType}}
+\newcommand{\receiveType}{\mbf{receiveType}}
+\newcommand{\select}{\mbf{select}}
+\newcommand{\caseLabel}[5]{\mbf{case}~#4~\mbf{of}~\{\&#3_#1~#4_#1 \rightarrow #5_#1\}^{#1 \in 1..#2}}
+\newcommand{\cancel}{\mbf{cancel}}
+\newcommand{\rraise}{\mbf{raise}}
+\newcommand{\try}[2]{\mbf{try}~#1~\mbf{otherwise}~#2}
+\newcommand{\tryin}[4]{\mbf{try}~#1~\mbf{as}~#2~\mbf{in}~#3~\mbf{otherwise}~#4}
+\newcommand{\lett}[3]{\mbf{let}~#1 = #2~\mbf{in}~#3}
+\newcommand{\Ckind}{\mbf{C}}
+\newcommand{\Skind}{\mbf{S}}
+\newcommand{\Tkind}{\mbf{T}}
+\newcommand{\End}{\text{End}}
+\newcommand{\Close}{\text{Close}}
+\newcommand{\Wait}{\text{Wait}}
+
+\newcommand{\mcal}[1]{\mathcal{#1}}
+\newcommand{\eq}{\equiv}
+\newcommand{\C}{\mcal{C}}
+\newcommand{\D}{\mcal{D}}
+\newcommand{\E}{\mcal{E}}
+\newcommand{\F}{\mcal{F}}
+\newcommand{\G}{\mcal{G}}
+\newcommand{\m}{\textit{\text{m}}}
+\newcommand{\bkind}{\upsilon}
+\newcommand{\kind}{\kappa}
+\newcommand{\T}{\textit{\text{T}}}
+\newcommand{\labelset}{\text{L}}
+\newcommand{\thread}{\mcal{k}}
+
+\newcommand{\run}[2]{#1~[#2]}
+
+\newcommand{\toparrow}[1]{\overrightarrow{#1}}
+\newcommand{\vv}{\toparrow{V}}
+\newcommand{\ww}{\toparrow{W}}
+\newcommand{\buf}{\leftrightsquigarrow}
+\newcommand{\eos}{\text{EOS}}
+
+\newcommand{\pol}{\sharp}
+\newcommand{\view}{\scalerel*{\bigstar}{\kind}}
+\newcommand{\viewsend}{\oplus}
+\newcommand{\viewreceive}{\text{\&}}
+\newcommand{\lbl}{\ell}
+\newcommand{\record}{\{\lbl\! : \T_\lbl\}_{\lbl \in \labelset}}
+\newcommand{\variant}{\langle \lbl\! : \T_\lbl\rangle_{\lbl \in \labelset}}
+\newcommand{\foralll}[3]{\forall #1\! : #2~.~#3}
+\newcommand{\recursion}[3]{\mu #1\! : #2.#3}
+
+\newcommand{\typectx}{\Gamma}
+\newcommand{\kindctx}{\Delta}
+\newcommand{\bind}[3]{#1,#2\! : #3}
+\newcommand{\empt}{\scalerel*{\mcal{E}}{\epsilon}}
+\newcommand{\typing}[3]{#1 \vdash #2\! : #3}
+
+\newcommand{\abs}[4]{\lambda_#1 #2\! : #3.#4}
+\newcommand{\pair}[2]{#1 \times #2}
+
+\theoremstyle{plain}
+\newtheorem{thm}{Theorem}
+
+\theoremheaderfont{\itshape}
+\theorembodyfont{\upshape}
+\newtheorem*{case}{Case}
+            
+\theoremstyle{nonumberplain}
+\theoremheaderfont{\scshape}
+\theorembodyfont{\upshape}
+\theoremsymbol{\scshape Q. E. D.}% or\ensuremath{ _{\Box}}, also add \usepackage{amssymb} 
+% or O. E. \ensuremath{\Delta} % for Euclid's  ὅπερ ἔδει δεῖξαι
+\theorempostwork{\setcounter{case}{0}}
+\newtheorem{proof}{Proof}
+
+\newenvironment{case1}{\begin{adjustwidth}{0.5cm}{}}{\end{adjustwidth}}
+\newenvironment{case2}{\begin{adjustwidth}{0.5cm}{}}{\end{adjustwidth}}
+\newenvironment{case3}{\begin{adjustwidth}{0.5cm}{}}{\end{adjustwidth}}
+\newenvironment{case4}{\begin{adjustwidth}{0.5cm}{}}{\end{adjustwidth}}
+
+\definecolor{blue}{RGB}{8,71,150}
+
+\title{\color{blue}
+  Exception Handling Rules for FreeST}
+\author{Mestrado em Engenharia Informática\\
+  Faculdade de Ciências da Universidade de Lisboa\\ \\
+  Bruno Faustino\\
+  fc59784}
+\date{2026/2027}
+
+\begin{document}
+\maketitle
+\setlength{\parskip}{1ex}
+\setlength{\parindent}{0pt}
+\thispagestyle{empty}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Syntax}
+
+\begin{align*}
+  & \text{Multiplicity}           &~ \m       & ::= \un~|~\lin                                                        \\
+  & \text{Basic Kinds}            &~ \bkind   & ::= \Ckind~|~\Skind~|~\Tkind                                          \\
+  & \text{Kinds}                  &~ \kind    & ::= \bkind^\m                                                         \\
+  & \text{Polarity}               &~ \pol     & ::= \m !~|~\m ?                                                       \\
+  & \text{View}                   &~ \view    & ::= \m\!\viewsend~|~\m\viewreceive                                    \\
+  & \text{Channel End}            &~ \End     & ::= \Close~|~\Wait                                                    \\
+  & \text{Types}                  &~ \T, U    & ::= \Skip~|~\pol\T~|~\view\record~|~\End~|~\T;\T                      \\
+                                &&& \phantom{~::=~} ()_\m~|~\pair{\T}{\T}~|~\T \rightarrow_\m \T~|~\record~|\variant  \\
+                                &&& \phantom{~::=~} \foralll{a}{\kind}{\T}~|~\recursion{a}{\kind}{\T}~|~a             \\
+  & \text{Kinding contexts}       &~ \kindctx & ::= \empt~|~\bind{\kindctx}{a}{\kind}                                 \\
+  & \text{Variables}              &~ x,y                                                                              \\
+  & \text{Terms}                  &~ L,M,N    & ::= x~|~\abs{\m}{x}{\T}{M}~|~M~N~|~()_m~|~(M,N)                       \\
+                                &&& \phantom{~::=~} \lett{()_\m}{M}{N}~|~\lett{(x,y)}{M}{N}                           \\
+                                &&& \phantom{~::=~} \channel~@\T~|~\fork~M~|~\send~M~N~|~\receive~M                   \\
+                                &&& \phantom{~::=~} \sendType~@\T~M~|~\receiveType~M                                  \\
+                                &&& \phantom{~::=~} \select~\lbl~|~\caseLabel{i}{n}{\ell}{M}{N}                       \\
+                                &&& \phantom{~::=~} \close~M~|~\wait~M~|~\cancel~M~|~\rraise                          \\
+                                &&& \phantom{~::=~} \tryin{L}{x}{M}{N}                                                \\
+  & \text{Typing contexts}        &~ \typectx & ::= \empt~|~\bind{\kindctx}{x}{\T}                                    \\
+  & \text{Configurations}         &~ \C,\D,\E & ::= (va)\C~|~\C~||~\D~|~\zap a~|~a(\vv) \buf b(\ww)                   \\
+  & \text{Evaluation contexts}    &~ \F       & ::= ...                                                               \\
+  & \text{Pure contexts}          &~ P        & ::= ...                                                               \\
+  & \text{Configuration contexts} &~ \G       & ::= [~]~|~(va)\G~|~\G~||~\C
+\end{align*}
+
+\section{Typing Rules}
+
+\begin{mathpar}
+  \inferrule*[Lab=t-cancel]
+    {\typing{\Gamma}{M}{T} \\ \typing{\Delta}{T}{\Skind^{\lin}}}
+    {\typing{\Gamma}{\cancel~M}{()}}
+
+  \inferrule*[Lab=t-raise]
+    { }
+    {\typing{}{\rraise}{\T}}
+
+  \inferrule*[Lab=t-tryin]
+    {\typing{\Gamma_1}{L}{\T_1} \\ \typing{\bind{\Gamma_2}{x}{\T_1}}{M}{\T_2} \\ \typing{\Gamma_2}{N}{\T_2}}
+    {\typing{\Gamma_1,\Gamma_2}{\tryin{L}{x}{M}{N}}{\T_2}}
+\end{mathpar}
+
+\section{Reduction Rules}
+
+\textbf{Term Reduction} \hfill \fbox{$M \rightarrow_M N$}
+\begin{align*}
+  & \text{E-TRYINVAL} &~ \tryin{V}{x}{M}{N} &~ \rightarrow_M M\{V/x\}
+\end{align*}
+\textbf{Configuration Equivalence} \hfill \fbox{$\C~\eq~\D$}
+
+$\C~||~(\D~||~\E)~\eq~(\C~||~\D)~||~\E$
+\hfill
+$\C~||~\D~\eq~\D~||~\C$
+\hfill
+$(va)(vb)\C~\eq~(vb)(va)\C$
+\begin{center}
+  $\C~||~(va)\D~\eq~(va)(\C~||~\D)$,\quad if $a \not\in \fn(\C)$
+\end{center}
+$a(\vv) \buf b(\ww)~\eq~b(\ww) \buf a(\vv)$
+\hfill
+$()~||~\C~\eq~\C$
+%\begin{center}
+%  $(va)(vb)(\zap a~||~\zap b~||~a(\empt) \buf b(\empt))~||~\C~\eq~\C$
+%\end{center}
+
+\textbf{Configuration Reduction} \hfill \fbox{$\C \rightarrow \D$}
+\begin{align*}
+  & \text{E-FORK} \quad\quad\quad\quad\quad\quad \lefteqn{\run{\F}{\fork~(\lambda x.M)}                          \rightarrow (va)(vb)(\run{\F}{a}~||~M\{b/x\}~||~a(\empt) \buf b(\empt)), \quad \text{where}~a,b~\text{are fresh}} \\
+  & \text{E-SEND}           &~ \run{\F}{\send~U~a}~||~a(\vv) \buf b(\ww)                                      &~ \rightarrow \run{\F}{a}~||~a(\vv) \buf b(\ww \cdot U)                                                             \\
+  & \text{E-RECEIVE}        &~ \run{\F}{\receive~a}~||~a(U \cdot \vv) \buf b(\ww)                             &~ \rightarrow \run{\F}{(U,a)}~||~a(\vv) \buf b(\ww)                                                                 \\
+  & \text{E-SENDTYPE}       &~ \run{\F}{\sendType~@U~a}~||~a(\vv) \buf b(\ww)                                 &~ \rightarrow \run{\F}{a}~||~a(\vv) \buf b(\ww \cdot @U)                                                            \\
+  & \text{E-RECEIVETYPE}    &~ \run{\F}{\receiveType~a}~||~a(@U \cdot \vv) \buf b(\ww)                        &~ \rightarrow \run{\F}{(@U,a)}~||~a(\vv) \buf b(\ww)                                                                \\
+  & \text{E-CLOSE}          &~ \run{\F}{\close~a}~||~a(\empt) \buf b(\ww)                                     &~ \rightarrow \run{\F}{()}~||~a(\empt) \buf b(\ww \cdot \eos)                                                       \\
+  & \text{E-WAIT}           &~ (va)(vb)(\run{\F}{\wait~a}~||~a(\eos) \buf b(\empt))                           &~ \rightarrow \run{\F}{()}                                                                                          \\
+  & \text{E-SELECT}         &~ \run{\F}{\select~\lbl~a}~||~a(\vv) \buf b(\ww)                                 &~ \rightarrow \run{\F}{a}~||~a(\vv) \buf b(\ww \cdot \lbl)                                                          \\
+  & \text{E-CASE} \quad\quad~ \lefteqn{\run{\F}{\caseLabel{i}{n}{\lbl}{a}{M}}~||~a(\lbl_j \cdot \vv) \buf b(\ww) \rightarrow \run{\F}{M_j}~||~a_j(\vv) \buf b(\ww)}                                                                \\
+  & \text{E-CANCEL}         &~ \run{\F}{\cancel~a}                                                            &~ \rightarrow \run{\F}{()}~||~\zap a                                                                                \\
+  & \text{E-ZAP}            &~ \zap a~||~a(U \cdot \vv) \buf b(\ww)                                           &~ \rightarrow \zap a~||~\zap U~||~a(\vv) \buf b(\ww)                                                                \\
+  & \text{E-RECEIVEZAP}     &~ \run{\F}{\receive~a}~||~\zap b~||~a(\empt) \buf b(\ww)                         &~ \rightarrow \run{\F}{\rraise}~||~\zap a~||~\zap b~||~a(\empt) \buf b(\ww)                                         \\
+  & \text{E-RECEIVETYPEZAP} &~ \run{\F}{\receiveType~a}~||~\zap b~||~a(\empt) \buf b(\ww)                     &~ \rightarrow \run{\F}{\rraise}~||~\zap a~||~\zap b~||~a(\empt) \buf b(\ww)                                         \\
+  & \text{E-WAITZAP}        &~ \run{\F}{\wait~a}~||~\zap b~||~a(\empt) \buf b(\ww)                            &~ \rightarrow \run{\F}{\rraise}~||~\zap a~||~\zap b~||~a(\empt) \buf b(\ww)                                         \\
+  & \text{E-CASEZAP} ~ \lefteqn{\run{\F}{\caseLabel{i}{n}{\lbl}{a}{M}}~||~\zap b~||~a(\empt) \buf b(\ww)         \rightarrow \run{\F}{\rraise}~||~\zap a~||~\zap b~||~a(\empt) \buf b(\ww)}                                        \\
+  & \text{E-TRYINRAISE}     &~ \run{\F}{\tryin{\run{P}{\rraise}}{x}{M}{N}}                                    &~ \rightarrow \run{\F}{N}~||~\zap P                                                                                 \\
+  & \text{E-RAISE}          &~ \run{P}{\rraise}                                                               &~ \rightarrow \zap P                                                                                                \\
+  & \text{E-LIFT}           &~ \run{\G}{\C}                                                                   &~ \rightarrow \run{\G}{\D}, \quad \text{if}~\C \rightarrow \D
+\end{align*}
+
+\end{document}
