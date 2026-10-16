@@ -1,0 +1,420 @@
+\documentclass[a4paper,11pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{palatino} % times is boring (but more concise)
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{listingsutf8}
+\usepackage{amssymb}
+\usepackage{enumitem}
+\usepackage{mathpartir}
+\usepackage{cleveref}
+\usepackage{xspace}
+
+\usepackage[most]{tcolorbox}
+\usepackage{environ}
+\usepackage{changepage}   % for the adjustwidth environment
+\usepackage[thmmarks,amsmath]{ntheorem}
+
+\usepackage{fontawesome7}
+\usepackage{pifont} % for the checkmarks
+\usepackage{tabularray} % for tables
+\UseTblrLibrary{siunitx}
+
+% Align
+\NewEnviron{complexalign}
+  {
+    \scalebox{0.6}{\parbox{0.9\textwidth}{
+      \begin{align*}
+        \BODY
+      \end{align*}
+    }}
+  }
+
+% Derivation
+\NewEnviron{derivation}
+  {
+    \scalebox{0.3}{\parbox{0.6\textwidth}{
+      \begin{adjustwidth}{-10cm}{-25cm}
+        \begin{mathpar}
+          \BODY
+        \end{mathpar}
+      \end{adjustwidth}
+    }}
+  }
+
+\newcommand{\zap}{\faBoltLightning}
+\newcommand{\zapm}{\text{\faBoltLightning}}
+\newcommand{\x}{\ding{55}}
+
+\theoremstyle{plain}
+\newtheorem{thm}{Theorem}
+
+\theoremheaderfont{\itshape}
+\theorembodyfont{\upshape}
+\newtheorem*{case}{Case}
+            
+\theoremstyle{nonumberplain}
+\theoremheaderfont{\scshape}
+\theorembodyfont{\upshape}
+\theoremsymbol{\scshape Q. E. D.}% or\ensuremath{ _{\Box}}, also add \usepackage{amssymb} 
+% or O. E. \ensuremath{\Delta} % for Euclid's  ὅπερ ἔδει δεῖξαι
+\theorempostwork{\setcounter{case}{0}}
+\newtheorem{proof}{Proof}
+
+\newenvironment{case1}{\begin{adjustwidth}{0.5cm}{}}{\end{adjustwidth}}
+\newenvironment{case2}{\begin{adjustwidth}{0.5cm}{}}{\end{adjustwidth}}
+\newenvironment{case3}{\begin{adjustwidth}{0.5cm}{}}{\end{adjustwidth}}
+\newenvironment{case4}{\begin{adjustwidth}{0.5cm}{}}{\end{adjustwidth}}
+
+\definecolor{blue}{RGB}{8,71,150}
+
+\title{\color{blue}
+  Reference Summary}
+\author{Mestrado em Engenharia Informática\\
+  Faculdade de Ciências da Universidade de Lisboa\\ \\
+  Bruno Faustino\\
+  fc59784}
+\date{2026/2027}
+
+\begin{document}
+\maketitle
+\tableofcontents
+\setlength{\parskip}{1ex}
+\thispagestyle{empty}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Rust Exceptions - Robust and Size-Optimized Error Handling in Rust for Resource-Constrained Embedded Systems}
+
+This paper discusses the differences between panic-based and result-based exception handling in Rust, focusing more on embedded systems, where software-based fault handling is essential due to lack of hardware redundacy and OS support.
+
+Rust's compiler profiles (dev, release, test, bench, custom) offer a way to change compiler settings like optimizations and debugging symbols. Compiler profiles have a significant influence on performance and code size. The paper evaluates the binary size and memory use of different exception handling strategies and compiler profiles.
+
+3 examples are used for the experiment, representing a balanced set of workloads common in embedded systems: computational, peripheral and memory-centric. For each example, 3 exception handling strategies are applied: no handling (baseline), return-based (Result<T, E>) and panic-based (panic-halt handler). For each, 6 different compiler profiles are used, totaling 54 binaries.
+
+The results show that the binary size between no exception handling and result-based is almost identical, even matching in compiler profiles with link-time optimization. This suggests that the addition of the boilerplate code for exception handling does not directly correlate with the size of the compiled binary. Meanwhile, panic-based consistently generated the largest binaries in every example and profile combination due to the inclusion of Rust's internal panic-handling routines, panic formatting mechanisms and additional braching from panic paths.
+
+While careful design of error handling contributes to efficiency, the broader optimization context defined by the build profile remains the determining factor.
+
+The result-based model offers a practical balance between safety, determinism and minimal footprint, making it the most suitable strategy.
+
+\href{https://docs.rust-embedded.org/book/start/panicking.html}{Panic Handlers}
+
+Reference (ACM): Philipp Schloyer, Bernhard Bauer, and Dominik Merli. 2026. Robust and Size-Optimized Error Handling in Rust for Resource-Constrained Embedded Systems. In 19th European Workshop on Systems Security (EuroSec'26), April 27--30, 2026, Edinburgh, Scotland Uk. ACM, New York, NY, USA, 7 pages. \href{https://doi.org/10.1145/3803525.3804990}{https://doi.org/10.1145/3803525.3804990}
+
+\section{Rust Channels}
+
+\begin{itemize}
+  \item Asynchronous channels by default.
+  \item Limited capacity: sender blocks if buffer is full.
+  \item On the receiver side, calls to close or the receiver handle dropping return an error in the sender side.
+  \item On the sender side, Result<(), SendError<T> > is returned, which can be matched in a case statement, allowing for the error cases to be handled.
+  \item Matching on the Result and then matching on the specific error is a lot of boilerplate. Function unwrap\_or\_else removes the need for the first match. Other variants such as unwrap and expect are also helpful: they return the Ok branch or call panic!, while expect also receives the panic message as argument, but these do not allow error handling.
+  \item The ? operator can be used to immediately propagate the error outside the function or continue if successful (methods can be chained with the ? operator).
+  \item Function try\_send does not block if the buffer is full, returning an error.
+  \item Function send\_timeout is like try\_send but first waits a given time before returning an error if the buffer is still full or the receiver is dropped.
+  \item Macro select evaluates multiple async branches and returns the first that completes.
+\end{itemize}
+
+References:
+
+\begin{itemize}
+  \item \href{https://doc.rust-lang.org/book/ch09-00-error-handling.html}{Error Handling}
+  \item \href{https://doc.rust-lang.org/rust-by-example/std_misc/channels.html}{STD Channels}
+  \item \href{https://docs.rs/tokio/1.53.2/tokio/sync/mpsc/struct.Sender.html#method.closed}{Tokio Channels}
+\end{itemize}
+
+\section{Java and .NET Exceptions - Exception Handling: A Field Study in Java and .NET}
+
+\begin{itemize}
+  \item In .NET the programmer is not forced to declare which exceptions can occur or deal with them, unlike Java: it does not have checked exceptions.
+  \item Being forced to think about errors and cathing them in a generic block can get the system in a corrupt state which is harder to debug, instead of simply terminating the application.
+  \item Main problems designing exception structures: global flow of exceptions and unanticipated exceptions.
+  \item Applying error handling code as an advice (in AOP terminology) tried to provide a clear separation between business code and exception handling code, and reduce the amount of code for exceptions. Handler reuse is more difficult than usually advertised - neither of the following aspects improved much: separation of concerns, coupling between components and depth of inheritance tree, cohesion in the access to fields by pairs of method and advice, and dimension of code.
+  \item Total amount of code used for handling exceptions is lower than expected because it is normally just used to alert the user, abort applications or force them to continue their executions, instead of actually recovering from the errors, even in mature applications.
+  \item Most common error handling: empty, log, change object state configuration, throw, continue loop (try again), return (or break), rollback try block, close, assert (new exception thrown if assert fails) and delegate (only for .NET).
+  \item Empty error handling isn't only used by lazy programmers so their programs compile. It is also used to avoid premature termination from non-fatal exceptions.
+  \item Log and throw are often used together.
+  \item finally handlers are often used to close connections and release resources, along with file deletion, event firing, stream flushing and thread termination.
+  \item For the most part, empty and log are the most common in catch handlers, and close is the most common in finally handlers.
+  \item The most common exception classes used in the catch statements are the generic ones, which can be explained by some of the most common exception handling being log and return.
+  \item Most Java exceptions are caught after 1 level in the stack, while .NET exceptions are more sparse, possibly being caught after 17 levels, since programmers are not forced to catch checked exceptions.
+  \item Most protected blocks have only 1 catch handler.
+  \item Programmers are concerned with throwing the exception objects that best fit the particular situation, but are not so concerned with implementing handling code.
+  \item The runtime should try to deal with the problems automatically whenever possible to free the programmer from doing so (without care...): \href{https://www.researchgate.net/publication/231240159\_Making\_Exception\_Handling\_Work}{https://www.researchgate.net/publication/231240159\_Making\_Exception\_Handling\_Work}.
+\end{itemize}
+
+Reference: Bruno Cabral and Paulo Marques. 2007. Exception handling: a field study in Java and .NET. In Proceedings of the 21st European conference on Object-Oriented Programming (ECOOP'07). Springer-Verlag, Berlin, Heidelberg, 151–-175. \href{https://dl.acm.org/doi/10.5555/2394758.2394770}{https://dl.acm.org/doi/10.5555/2394758.2394770}
+
+\section{Java Exceptions and Channels}
+
+\begin{itemize}
+  \item JVM waits for all non-daemon threads to end, even if the main thread has already ended.
+  \item Unhandled exceptions are printed to the terminal by default, along with the stack trace.
+  \item Exceptions in a child thread do not propagate to the main thread, but terminate the child thread and print the exception and stack trace.
+  \item Channels can read into (write) or out of buffers. The operation is always read. The buffer needs to be flipped to switch between read and write.
+  \item Data remains in the buffer after reading: it needs to be freed with clear or compress.
+  \item Some data can never be read.
+  \item There are many types of channels (for files, sockets, ...).
+  \item Channels can usually be in blocking or non-blocking mode.
+  \item Non-blocking mode uses Java's Future class. Alternatively, a CompletionHandler can be used during write and read operations, which needs 2 methods to be implemented: one if the operation succeeded (completed) and another if it failed (failed). The last one receives the exception that was thrown as argument.
+\end{itemize}
+
+References:
+
+\begin{itemize}
+  \item \href{https://marcelkliemannel.com/articles/2021/what-happens-if-the-main-method-throws-an-exception/}{Exceptions on the main method}
+  \item \href{https://medium.com/@balajiselvam245/handling-uncaught-exceptions-in-java-fc973b57d809}{Exceptions on a child thread}
+  \item \href{https://jenkov.com/tutorials/java-nio/index.html}{Java Channels}
+\end{itemize}
+
+\section{Kotlin Exceptions and Channels}
+
+\begin{itemize}
+  \item Exceptions are all unchecked by default.
+  \item Similar to Java, exceptions belong to an Exception class that can be extended with new exceptions, which can be thrown and caught. Multiple exceptions can be caught in the same try block (with different catch blocks). finally block is executed after either the try or catch blocks finish.
+  \item Overall result comes from either the try or catch blocks. The finally block does not change the result.
+  \item Classes that implement AutoClosable provide the use function that closes the resource after the specified block of code is executed.
+  \item Built-in functions require, check and error reduce some of the usual boilerplate code. require verifies the arguments passed to the function throwing an exception if it fails. check verifies the state of an object, throwing an exception if it fails. error throws an exception if reached. The first two allow the compiler to perform smart casting, casting the variable used to a non-nullable type if the checks are successful.
+  \item The result of the try-catch block can be assigned to a variable.
+  \item The result of throw has type Nothing, which is a subtype of all other types. If the compiler infers a Nothing type in the function signature, it warns the user (unless the function explicitly returns Nothing).
+  \item Provides compile-time warnings for potential runtime errors.
+  \item Uncaught exceptions print a message in the terminal and terminate the thread.
+  \item Kotlin uses coroutines which are similar to threads but they dont need to execute on a particular thread, making them more lightweight.
+  \item Main coroutine is launched from GlobalScope.
+  \item Uncaught exceptions in child coroutines are propagated to the parent until they reach the main coroutine.
+  \item If the main coroutine does not catch an exception, the UncaughtExceptionHandler kicks in like Java, printing a message and crashing the app.
+  \item CoroutineExceptionHandler allows the programmer to specify an exception handler that is executed when all children of the main coroutine finish executing and any threw an exception, instead of calling the UncaughtExceptionHandler. Here the first exception is caught and all other exceptions come with it as supressed. If the child coroutine was launched with async and throws an exception, even if the exception is caught in the parent after calling await, it still goes up until the CoroutineExceptionHandler (but the parent continues execution).
+  \item When child coroutines fail due to an exception, they throw CancelledException, which can be caught by the parent during a join with the child. The parent has access to the specific exception thrown in the child.
+  \item Child coroutines fail silently if they are async and no await is called.
+  \item Program terminates when the main coroutine ends, even if there are other coroutines running.
+  \item Channels are used to communicate between coroutines.
+  \item Channels are synchronous if no buffer size is specified and asyncronous otherwise.
+  \item On channel close, a token is sent to the buffer.
+  \item Channels can be accessed by multiple producers and consumers.
+  \item Exceptions are thrown if send is invoked on a closed channel or receive is invoked on a closed channel with an empty buffer.
+\end{itemize}
+
+References:
+
+\begin{itemize}
+  \item \href{https://kotlinlang.org/docs/exceptions.html}{Kotlin Exception Handling}
+  \item \href{https://kotlinlang.org/docs/exception-handling.html}{Kotlin Coroutines}
+  \item \href{https://medium.com/the-kotlin-chronicle/coroutine-exceptions-3378f51a7d33}{Exception handling in Kotlin coroutines 1}
+  \item \href{https://medium.com/@jecco_man/why-exception-handling-with-kotlin-coroutines-is-so-hard-and-how-to-successfully-master-it-3c6064a62d3e}{Exception handling in Kotlin coroutines 2}
+  \item \href{https://kotlinlang.org/docs/channels.html}{Kotlin Channels}
+  \item \href{https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.channels/}{Kotlin Channels Documentation}
+  \item \href{https://stackoverflow.com/questions/71682402/kotlin-not-waiting-for-a-coroutine-to-finish}{Kotlin Main Thread}
+\end{itemize}
+
+\section{Scala Exceptions}
+
+\begin{itemize}
+  \item Has try-catch-finally like Java and Kotlin, but the syntax is more similar to the match syntax.
+  \item Has Option class with Some and None subclasses, which can be used in pattern matching.
+  \item Either class is also available, and Left can have a subclass of exception.
+  \item Also has for...yields... blocks. If the code in the for block succeeds, the yield block is executed and its result is wrapped in Some. Otherwise, the result is None.
+  \item Another alternative is using datatype Try with instances Success and Failure, which is easier for functional composability than try-catch since the exception can be handled later.
+  \item Catch objects can be used to centralize exception handling code and avoid repeating code. They can be used with Try to match specific exceptions and handle them in already defined ways, or ignore specific exceptions.
+  \item Exceptions are printed to the terminal when uncaught.
+  \item An exception in a child thread does not stop the parent thread.
+  \item Running a child thread should be wrapped in a future, so that the parent can catch exceptions in the child thread if needed.
+\end{itemize}
+
+References:
+
+\begin{itemize}
+  \item \href{https://docs.scala-lang.org/scala3/book/fp-functional-error-handling.html}{Functional Scala Exception Handling}
+  \item \href{https://www.baeldung.com/scala/exception-handling}{Scala Exception Handling}
+\end{itemize}
+
+\section{Scala Channels}
+
+\begin{itemize}
+  \item Scala does not have built-in channels, but the Ox library provides channels to Scala that are similar to Go.
+  \item Sending and receiving are blocking operations. If the buffer has a capacity larger than 1, sending can be non-blocking until the buffer is full.
+  \item done is used to close a channel and error is used to signal an exception.
+  \item receive returns an Either with Left having a ChannelState, which can be Done or Error. Exceptions are handled in a match expression.
+\end{itemize}
+
+Reference: \href{https://softwaremill.com/go-like-channels-using-project-loom-and-scala/}{Scala Channels}
+
+\section{Haskell Exceptions and Channels}
+
+\begin{itemize}
+  \item Exception is a type class that can be instantiated with new custom exceptions. In a datatype used to instantiate Exception, all of its constructors are used as new exceptions.
+  \item SomeException is the generic exception and SomeAsyncException is the generic async exception.
+  \item Exceptions can be thrown from IO operations, pure code (function evaluate must be called on the pure code) and external events (asynchronous).
+  \item Library Control.Exception offers functions try, catch and finally. Function handle is similar to catch but with the arguments swapped.
+  \item Uses the IO monad.
+  \item Only main difference between try and catch is that the handler used in catch cannot be interrupted by an asynchronous exception. Raising an asynchronous exception (with throwTo) blocks until the catch handler completes.
+  \item Function throwTo is used to throw an exception in another thread (asynchronous).
+  \item Functions bracket, finally and onException are similar and allow a second computation to be performed, even if the first raised an exception.
+  \item Threads are independent but there is a main thread.
+  \item The program terminates when the main thread finishes executing. All other threads will terminate as well.
+  \item Default uncaught exception handler logs an error message based on the Show instance. It can be changed in all threads with function setUncaughtExceptionHandler.
+  \item The application crashes if an uncaught exception is thrown in the main thread.
+  \item Exceptions in the uncaught exception handler terminate the main thread with an error message, or get stuck in a loop if it happened in another thread, which eventually terminates.
+  \item Exceptions are not passed to the parent thread.
+  \item Alternatively, exceptions can go in the Left of the Either monad and a case statement can be used to handle exceptions.
+  \item Exceptions can only be caught in IO code.
+  \item Channels also use the IO monad and are unbounded.
+\end{itemize}
+
+References:
+
+\begin{itemize}
+  \item \href{https://stackoverflow.com/questions/6009384/exception-handling-in-haskell}{Haskell Impure try catch handle}
+  \item \href{https://hackage-content.haskell.org/package/base-4.22.0.0/docs/Control-Exception.html}{Haskell Exception Handling}
+  \item \href{https://learn-haskell.blog/06-errors_and_files/01-either.html}{Haskell Exception Handling with Either}
+  \item \href{https://stackoverflow.com/questions/24998600/what-happens-to-child-threads-when-their-parent-dies-in-ghc-haskell}{Haskell Threads}
+  \item \href{https://taylor.fausak.me/2021/04/03/default-exception-handler-in-haskell/}{Haskell Uncaught Exception Handler}
+  \item \href{https://hackage-content.haskell.org/package/base-4.22.0.0/docs/Control-Concurrent.html}{Haskell Threads Docs}
+  \item \href{https://hackage.haskell.org/package/base-4.3.0.0/docs/Control-Concurrent-Chan.html}{Haskell Channels}
+\end{itemize}
+
+Related Papers:
+
+\begin{itemize}
+  \item \href{http://research.microsoft.com/~simonpj/Papers/asynch-exns.htm}{Asyncronous exceptions in Haskell}
+  \item A semantic for imprecise exceptions
+\end{itemize}
+
+\section{OCaml Exceptions}
+
+\begin{itemize}
+  \item Exceptions do not appear in types, but they are compiled into efficient machine code.
+  \item Exceptions belong to an extensible sum type exn and are instantiated with the keyword exception in a way similar to defining a datatype.
+  \item Exceptions are caught with try-with, similar to try-catch, where the with block is similar to a case block with exceptions.
+  \item Has functions invalid\_arg and failwith that automatically raise the predefined exceptions Invalid\_argument and Failure due to invalid parameters and results that could not be produced, that receive a string for the log message.
+  \item Module Fun has function protect which receives the finally and try-catch blocks, which works like other languages. If an exception is thrown in the finally block, it is wrapped inside the exception Finally\_raised to distinguish it from an exception in the other blocks.
+  \item Asynchronous exceptions are thrown when an external factor does not allow the execution of the program and it usually does not make sense to handle them in the program. Examples are Out\_of\_memory, Stack\_overflow and Sys.Break.
+  \item Module Printexc allows access to the message and stack trace of an exception and defining an exception's message.
+  \item Type option works like Haskell's Maybe and has functions map and bind that reduce nested match cases. The downside compared to exceptions is that it does not inform about the reason for returning None.
+  \item Type result works like Haskell's Either and Rust's Result and has functions map, map\_error and bind, similar to option. The left side of result can be of type exn, making it also a good strategy for dealing with exceptional situations.
+  \item Default uncaught exception handler that prints the exception (can be changed).
+  \item Exceptions in a child thread are not propagated to the parent thread.
+  \item Program terminates when the main thread finishes executing and all other threads are interrupted.
+\end{itemize}
+
+References:
+
+\begin{itemize}
+  \item \href{https://ocaml.org/docs/error-handling}{OCaml Exception Handling}
+  \item \href{https://ocaml.org/manual/5.5/api/Thread.html}{OCaml Threads}
+  \item \href{https://stackoverflow.com/questions/4666628/do-child-threads-exit-when-the-parent-thread-terminates}{Ocaml Main Thread}
+\end{itemize}
+
+\section{Go Exceptions and Channels}
+
+\begin{itemize}
+  \item Errors are values returned explicitly from functions, instead of being hidden in exceptions. Any type that implements method Error of interface error can be considered an error.
+  \item Function fmt.Errorf allows errors to be wrapped inside other errors (using \%w).
+  \item Functions return a pair with the result and an error (which can be nil, meaning no error).
+  \item Structs can be defined as errors and can include an enum with the cause of the error.
+  \item Handling of errors is done with ifs.
+  \item Function errors.Is traverses the error tree and returns true if any error matches the target error. This is useful because we lose error equality when wrapping errors inside other errors. Aditionally, the Is function can be overwritten to change what it means for the errors to be equal.
+  \item Function errors.As is similar, but it works with types instead of values. If it finds an error in the error tree with the given type, it assigns that error value to the provided pointer. It can also be overwritten using reflection.
+  \item Function errors.Join concatenates multiple errors, separating them by new lines. The resulting error still Is each one of the joined errors.
+  \item Program terminates when the main thread terminates.
+  \item Error handling while using goroutines and channels needs a separate channel dedicated to receiving possible errors of the program. This introduces a lot of boilerplate. An alternative is using golang.org/x/sync/errgroup, which allow for the creation of an error group and launching goroutines from a function that can return an error, associating the function/goroutine with the error group. The error group can be waited for, returning all the errors that ocurred in the coroutines of the group, if any.
+\end{itemize}
+
+References:
+
+\begin{itemize}
+  \item \href{https://www.datadoghq.com/blog/go-error-handling/}{Go Exceptions}
+  \item \href{https://medium.com/@caring_smitten_gerbil_914/gos-errors-is-and-errors-as-unwrapping-the-right-way-cff69b374a1f}{Go Functions errors.Is and errors.As}
+  \item \href{https://www.bytesizego.com/blog/go-error-chains-how-errors-is-errors-as-and-errors-join-actu}{Go Function errors.Join (with Is and As again)}
+  \item \href{https://medium.com/@developer.naren/handling-errors-in-channels-e76ad5cbf3a0}{Go Error Handling in Channels}
+  \item \href{https://www.reddit.com/r/golang/comments/1ge1sh7/difference_between_the_main_thread_and_the_go/}{Go Main Thread}
+\end{itemize}
+
+\section{Python Exceptions}
+
+\begin{itemize}
+  \item Uses exceptions like Java.
+  \item Exceptions go up the call stack until a suitable handler for it is found. If none is found, the program terminates and an error message is printed.
+  \item Exceptions are thrown with raise.
+  \item Exceptions are caught and handled with try-except, similar to Java's try-catch. An except without an explicit exception catches any exception. Multiple exceptions can be caught in the same except block.
+  \item The complete exception handling syntax is try-except-else-finally. try, except and finally work like try, catch and finally in Java. The else block executes only if no exception was raised in the try block, while finally always executes.
+  \item Exceptions can be re-raised inside an except block for an outer exception handler to catch. Here, raise does not need to receive the exception again.
+  \item try-except can be used in asynchronous context in the same way.
+  \item Custom exceptions can be made by creating a new class that inherits from one of the built-in exception classes or the base Exception class.
+  \item Honeybadger, Sentry and Datadog are error monitoring services which allow real-time monitoring and visualization of the exceptions that are raised by the application.
+  \item Non-daemon child threads keep executing after the main thread completes.
+  \item Child threads do not propagate exceptions to the main thread. It can be possible through some sort of message passing.
+\end{itemize}
+
+References:
+
+\begin{itemize}
+  \item \href{https://www.honeybadger.io/blog/a-guide-to-exception-handling-in-python/}{Python Exception Handling}
+  \item \href{https://dev.to/imsushant12/multithreading-in-python-lifecycle-locks-and-thread-pools-3pg3}{Python Threads}
+\end{itemize}
+
+\section{FreeST Syntax - Polymorphic lambda calculus with context-free session types}
+
+\begin{itemize}
+  \item Syntax.
+\end{itemize}
+
+Reference: \href{https://www.sciencedirect.com/science/article/pii/S0890540122001031}{FreeST Syntax}
+
+\section{Conclusions}
+
+\begin{itemize}
+  \item Exceptions are a class that can be extended/instantiated with new exceptions. But FreeST does not have type classes like Haskell.
+  \item Only Java has checked exceptions by the compiler and methods need to declare in their signature all the checked exceptions that the method can throw.
+  \item Rust does not have exceptions and resorts to a Either-like type (Result) for computations that can fail.
+  \item There is a default uncaught exception handler that usually terminates the thread and logs an error message. Each thread can be given its own uncaught exception handler.
+  \item Haskell's throwTo function allows a thread to raise an exception in another thread, using its id.
+  \item All languages with exceptions have a try-catch-finally and throw syntax. OCaml uses try-with instead of try-catch and raise instead of throw. Haskell has functions try, catch and finally that receive blocks of code instead of using all 3 like the other languages. Python has an aditional block - else - which is executed after the try block, only if it succeeded.
+  \item Kotlin and OCaml have functions that automatically throw specific exceptions when called, reducing some of the boilerplate code.
+  \item Rust, Haskell, OCaml and Scala have the Maybe/Option type. Maybe/Option can be used to return a Nothing/None result when a computation fails instead of a default value that we could not distinguish from a possible correct result of the function. The downside is that it does retain information about the cause of the error, unlike exceptions. The languages have a way to chain multiple computations that return Maybe/Option, using the wrapped results of the functions if they are Just/Some or immediately return Nothing/None if one of the functions fails, reducing multiple nested match cases.
+  \item Rust, Haskell, OCaml and Scala have the Either/Result type. Exception handling with try-catch provides a better separation of concerns but can be more verbose than the Either/Result variant enhanced with chaining methods.
+  \item Go does not have exceptions. It has errors that are treated just like values and can be wrapped inside other errors. Any type can be used as an error, including structs. Functions that can fail always return a pair with the result and an error, which can be or not nil. If it is not nil, functions errors.Is and errors.As can be used to check if there is an error value (or error type, respectively) inside the error tree. These functions are used in ifs to treat the errors. Errors can also be concatenated with errors.Join. Goroutines can either use a channel reserved for receiving errors or belong to an error group, which allows them to simply return an error if needed since calling Wait on the group will automatically return all the errors in the goroutines.
+  \item In Rust, binary size from result-based handling is identical to no exception handling, while panic-based handling generated larger binaries due to panic-handling routines, panic formatting mechanisms and branching from panic paths.
+  \item Forcing the user to think about exceptions and catching them in a generic block can get the system in a corrupt state instead of terminating the application, making it harder to debug.
+  \item Most common error handling: empty, log, change object state configuration, throw, continue loop, return, rollback, close and assert.
+  \item Most common caught exceptions are the generic ones.
+  \item Programmers are concerned with throwing the exceptions that best fit the situation, but not so concerned with implementing handling code.
+\end{itemize}
+
+\begin{table}[h!]
+\footnotesize
+\centering
+\begin{tblr}{
+  colspec={X[l] *{9}{X[c]}},
+  rowspec={X[m] *{11}{X[m]}},
+  column{1}={wd=2.7cm}, column{2-Z}={wd=0.93cm},
+  row{1}={guard}, row{2-Z}={ht=1cm, abovesep=0pt, belowsep=0pt},
+  hline{1}={2-Z}{}, hline{2-Z}={},
+  vline{1}={2-Z}{}, vline{2-Z}={}
+}
+                                 & Java & Kotlin & Scala & Python & Haskell & OCaml & Rust & Go & Erlang \\
+Exceptions                       & \x   & \x     & \x    & \x     & \x      & \x    &      &    &        \\
+Either/Result                    &      &        & \x    &        & \x      & \x    & \x   &    &        \\
+Error Values                     &      &        &       &        &         &       &      & \x &        \\
+try-catch-finally                & \x   & \x     & \x    & \x     & \x*     & \x    &      &    &        \\
+match-case                       &      &        & \x    &        & \x      & \x    & \x   &    &        \\
+if-else                          &      &        &       &        &         &       &      & \x &        \\
+Built-in Thrower Functions       &      & \x     &       &        &         & \x    & \x** &    &        \\
+Operation Chaining               &      &        & \x    &        & \x      & \x    & \x   &    &        \\
+Uncaught Exception Handler       & \x   & \x     & \x    & \x     & \x      & \x    & \x***&    &        \\
+Children Survive After Main Dies & \x   &        & \x    & \x     &         &       &      &    &        \\
+Children Raise to Parent         &      & \x     & \x    &        &         &       &      &    &        \\
+\end{tblr}
+\end{table}
+
+* try catch and finally are functions, not syntax of the language
+
+** unwrap/expect functions, which call panic on Err
+
+*** panic handler: abort, halt, ...
+
+\end{document}
