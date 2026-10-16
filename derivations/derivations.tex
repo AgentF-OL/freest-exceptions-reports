@@ -1,0 +1,230 @@
+\documentclass[a4paper,11pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{palatino} % times is boring (but more concise)
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{listingsutf8}
+\usepackage{amssymb}
+\usepackage{enumitem}
+\usepackage{mathpartir}
+\usepackage{cleveref}
+\usepackage{xspace}
+
+\usepackage[most]{tcolorbox}
+\usepackage{environ}
+\usepackage{changepage}   % for the adjustwidth environment
+\usepackage[thmmarks,amsmath]{ntheorem}
+
+\usepackage{fontawesome7}
+
+% Align
+\NewEnviron{complexalign}
+  {
+    \scalebox{0.6}{\parbox{0.9\textwidth}{
+      \begin{align*}
+        \BODY
+      \end{align*}
+    }}
+  }
+
+% Derivation
+\NewEnviron{derivation}
+  {
+    \scalebox{0.3}{\parbox{0.6\textwidth}{
+      \begin{adjustwidth}{-10cm}{-25cm}
+        \begin{mathpar}
+          \BODY
+        \end{mathpar}
+      \end{adjustwidth}
+    }}
+  }
+
+\newcommand{\zap}{\faBoltLightning}
+\newcommand{\zapm}{\text{\faBoltLightning}}
+
+\theoremstyle{plain}
+\newtheorem{thm}{Theorem}
+
+\theoremheaderfont{\itshape}
+\theorembodyfont{\upshape}
+\newtheorem*{case}{Case}
+            
+\theoremstyle{nonumberplain}
+\theoremheaderfont{\scshape}
+\theorembodyfont{\upshape}
+\theoremsymbol{\scshape Q. E. D.}% or\ensuremath{ _{\Box}}, also add \usepackage{amssymb} 
+% or O. E. \ensuremath{\Delta} % for Euclid's  ὅπερ ἔδει δεῖξαι
+\theorempostwork{\setcounter{case}{0}}
+\newtheorem{proof}{Proof}
+
+\newenvironment{case1}{\begin{adjustwidth}{0.5cm}{}}{\end{adjustwidth}}
+\newenvironment{case2}{\begin{adjustwidth}{0.5cm}{}}{\end{adjustwidth}}
+\newenvironment{case3}{\begin{adjustwidth}{0.5cm}{}}{\end{adjustwidth}}
+\newenvironment{case4}{\begin{adjustwidth}{0.5cm}{}}{\end{adjustwidth}}
+
+\definecolor{blue}{RGB}{8,71,150}
+
+\title{\color{blue}
+  Derivations of Exceptions Prog Tests in FreeST}
+\author{Mestrado em Engenharia Informática\\
+  Faculdade de Ciências da Universidade de Lisboa\\ \\
+  Bruno Faustino\\
+  fc59784}
+\date{2026/2027}
+
+\begin{document}
+\maketitle
+\setlength{\parskip}{1ex}
+\thispagestyle{empty}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{RaiseRaiseRaise}
+
+\subsection{Type}
+
+\begin{derivation}
+  \inferrule*[Right=t-try]
+    {
+      \inferrule*[Left=t-try]
+        {
+          \inferrule*[Left=t-try]
+            {
+              \inferrule*[lab=t-raise]
+                { }
+                {\vdash raise : ()}
+              \\
+              \inferrule*[lab=t-unit]
+                { }
+                {\vdash () : ()}
+              \\
+              \inferrule*[Left=t-seq]
+                {
+                  \inferrule*[Left=t-app]
+                    {
+                      \vdash print : String \rightarrow ()
+                      \\
+                      "Ground" : String
+                    }
+                    {print\; "Ground" : ()}
+                  \inferrule*[lab=t-raise]
+                    { }
+                    {\vdash raise : ()}
+                }
+                {print\; "Ground"; raise : ()}
+            }
+            {\vdash try... : ()}
+          \\
+          \inferrule*[lab=t-unit]
+                { }
+                {\vdash () : ()}
+              \\
+              \inferrule*[Left=t-seq]
+                {
+                  \inferrule*[Left=t-app]
+                    {
+                      \vdash print : String \rightarrow ()
+                      \\
+                      "1st\; Floor" : String
+                    }
+                    {print\; "1st\; Floor" : ()}
+                  \inferrule*[lab=t-raise]
+                    { }
+                    {\vdash raise : ()}
+                }
+                {print\; "1st\; Floor"; raise : ()}
+        }
+        {\vdash try\; try... : ()}
+        \\
+        \inferrule*[lab=t-unit]
+          { }
+          {\vdash () : ()}
+        \\
+        \inferrule*[Left=t-seq]
+          {
+            \inferrule*[Left=t-app]
+              {
+                \vdash print : String \rightarrow ()
+                \\
+                "2nd\; Floor" : String
+              }
+              {print\; "2nd\; Floor" : ()}
+            \inferrule*[lab=t-raise]
+              { }
+              {\vdash raise : ()}
+          }
+          {print\; "2nd\; Floor"; raise : ()}
+    }
+    {\vdash try\; try\; try... : ()}
+\end{derivation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{TryReceiveChainDrop2}
+
+\subsection{Evaluation}
+
+\begin{complexalign}
+              &~(va)(vb)(sendInts~(1,2,4)~a~||~sumInts~b)                                                                                                                                             \\
+  \rightarrow &~(va)(vb)(a~\triangleright~send~1~\triangleright~drop~||~try~receive~b~as~(n1,b)~in~M~otherwise~0~||~a(\epsilon)\leftrightsquigarrow b(\epsilon)) && \mathit{by~definition}            \\
+  \rightarrow &~(va)(vb)(a~\triangleright~drop~||~try~receive~b~as~(n1,b)~in~M~otherwise~0~||~a(\epsilon)\leftrightsquigarrow b(1))                              && \mathit{by~\mathtt{E-SEND}}       \\
+  \rightarrow &~(va)(vb)(()~||~\zapm~a~||~try~receive~b~as~(n1,b)~in~M~otherwise~0~||~a(\epsilon)\leftrightsquigarrow b(1))                                        && \mathit{by~\mathtt{E-CANCEL}}     \\
+  \rightarrow &~(va)(vb)(()~||~\zapm~a~||~try~(1,b)~as~(n1,b)~in~M~otherwise~0~||~a(\epsilon)\leftrightsquigarrow b(\epsilon))                                     && \mathit{by~\mathtt{E-RECEIVE}}    \\
+  \rightarrow &~(va)(vb)(()~||~\zapm~a~||~M[(1,b)/(n1,b)]~||~a(\epsilon)\leftrightsquigarrow b(\epsilon))                                                          && \mathit{by~\mathtt{E-VAL}}        \\
+  \rightarrow &~(va)(vb)(()~||~\zapm~a~||~try~receive~b~as~(n2,b)~in...otherwise~1~||~a(\epsilon)\leftrightsquigarrow b(\epsilon))                                 && \mathit{by~definition~of~M}       \\
+  \rightarrow &~(va)(vb)(()~||~\zapm~a~||~try~raise~as~(n2,b)~in...otherwise~1~||~\zapm~b~||~a(\epsilon)\leftrightsquigarrow b(\epsilon))                            && \mathit{by~\mathtt{E-RECEIVEZAP}} \\
+  \rightarrow &~(va)(vb)(()~||~\zapm~a~||~1~||~\zapm~b~||~a(\epsilon)\leftrightsquigarrow b(\epsilon))                                                               && \mathit{by~\mathtt{E-RAISE}}      \\
+  \equiv      &~()~||~1                                                                                                                                                                               \\
+  \equiv      &~1
+\end{complexalign}
+
+\section{AllChannelsCancelled}
+
+\subsection{Evaluation}
+
+\begin{complexalign}
+              &~let~(w,r) = channel~@Three~in~sendInts~(1,2,4)~w;~print~\$~sumInts~r                                                                                                                                                                                                                                                     \\
+  \rightarrow &~(va1)(vb1)(let~(a1,b1) = (a1,b1)~in~sendInts~(1,2,4)~a1;~print~\$~sumInts~b1~||~a1(\epsilon)\leftrightsquigarrow b1(\epsilon))                                                && \mathit{by~\mathtt{E-LET}~and~channel}                          \\
+  \rightarrow &~(va1)(vb1)(sendInts~(1,2,4)~a1;~print~\$~sumInts~b1~||~a1(\epsilon)\leftrightsquigarrow b1(\epsilon))                                                                         && \mathit{by~\mathtt{E-LETV}}                                     \\
+  \rightarrow &~(va1)(vb1)(let~(a2,b2) = channel~@Two~in...;~print~\$~sumInts~b1~||~a1(\epsilon)\leftrightsquigarrow b1(\epsilon))                                                            && \mathit{by~definition~of~sendInts}                              \\
+  \rightarrow &~(va1)(vb1)(va2)(vb2)(let~(a3,b3) = channel~@One~in...;~print~\$~sumInts~b1~||~a1(\epsilon)\leftrightsquigarrow b1(\epsilon)~||~a2(\epsilon)\leftrightsquigarrow b2(\epsilon)) && \mathit{by~\mathtt{E-LET}~and~\mathtt{E-LETV}}                  \\
+  \rightarrow &~(va1)(vb1)(va2)(vb2)(va3)(vb3)(let~a1 = a1~\triangleright~send~1~\triangleright~send~b2~in...;~print~\$~sumInts~b1 \\
+              &~||~a1(\epsilon)\leftrightsquigarrow b1(\epsilon)~||~a2(\epsilon)\leftrightsquigarrow b2(\epsilon)~||~a3(\epsilon)\leftrightsquigarrow b3(\epsilon))                           && \mathit{by~\mathtt{E-LET}~and~\mathtt{E-LETV}}                  \\
+  \rightarrow &~(va1)(vb1)(va2)(vb2)(va3)(vb3)(let~a2 = a2~\triangleright~send~2~\triangleright~send~b3~in...;~print~\$~sumInts~b1 \\
+              &~||~a1(\epsilon)\leftrightsquigarrow b1(1~b2)~||~a2(\epsilon)\leftrightsquigarrow b2(\epsilon)~||~a3(\epsilon)\leftrightsquigarrow b3(\epsilon))                               && \mathit{by~\mathtt{E-SEND},~\mathtt{E-LET}~and~\mathtt{E-LETV}} \\
+  \rightarrow &~(va1)(vb1)(va2)(vb2)(va3)(vb3)((let~a3 = a3~\triangleright~send~4~in~close~a3;~close~a2;~close~a1);~print~\$~sumInts~b1 \\
+              &~||~a1(\epsilon)\leftrightsquigarrow b1(1~b2)~||~a2(\epsilon)\leftrightsquigarrow b2(2~b3)~||~a3(\epsilon)\leftrightsquigarrow b3(\epsilon))                                   && \mathit{by~\mathtt{E-SEND},~\mathtt{E-LET}~and~\mathtt{E-LETV}} \\
+  \rightarrow &~(va1)(vb1)(va2)(vb2)(va3)(vb3)((close~a3;~close~a2;~close~a1);~print~\$~sumInts~b1 \\
+              &~||~a1(\epsilon)\leftrightsquigarrow b1(1~b2)~||~a2(\epsilon)\leftrightsquigarrow b2(2~b3)~||~a3(\epsilon)\leftrightsquigarrow b3(4))                                          && \mathit{by~\mathtt{E-SEND},~\mathtt{E-LET}~and~\mathtt{E-LETV}} \\
+  \rightarrow &~(va1)(vb1)(va2)(vb2)(va3)(vb3)(print~\$~sumInts~b1 \\
+              &~||~a1(\epsilon)\leftrightsquigarrow b1(1~b2~EOF)~||~a2(\epsilon)\leftrightsquigarrow b2(2~b3~EOF)~||~a3(\epsilon)\leftrightsquigarrow b3(4~EOF))                              && \mathit{by~\mathtt{E-CLOSE}}                                    \\
+  \rightarrow &~(va1)(vb1)(va2)(vb2)(va3)(vb3)(print~\$~drop~b1;~Nothing \\
+              &~||~a1(\epsilon)\leftrightsquigarrow b1(1~b2~EOF)~||~a2(\epsilon)\leftrightsquigarrow b2(2~b3~EOF)~||~a3(\epsilon)\leftrightsquigarrow b3(4~EOF))                              && \mathit{by~definition~of~sumInts}                               \\
+  \rightarrow &~(va1)(vb1)(va2)(vb2)(va3)(vb3)(print~\$~();~Nothing~||~\zapm~b1 \\
+              &~||~a1(\epsilon)\leftrightsquigarrow b1(1~b2~EOF)~||~a2(\epsilon)\leftrightsquigarrow b2(2~b3~EOF)~||~a3(\epsilon)\leftrightsquigarrow b3(4~EOF))                              && \mathit{by~\mathtt{E-CANCEL}}                                   \\
+  \rightarrow &~(va1)(vb1)(va2)(vb2)(va3)(vb3)(print~\$~();~Nothing~||~\zapm~b1~||~\zapm~1~||~\zapm~b2~||~\zapm~EOF(a1) \\
+              &~||~a1(\epsilon)\leftrightsquigarrow b1(\epsilon)~||~a2(\epsilon)\leftrightsquigarrow b2(2~b3~EOF)~||~a3(\epsilon)\leftrightsquigarrow b3(4~EOF))                              && \mathit{by~3x\mathtt{E-ZAP}}                                    \\
+  \rightarrow &~(va1)(vb1)(va2)(vb2)(va3)(vb3)(print~\$~();~Nothing~||~\zapm~b1~||~\zapm~b2~||~\zapm~a1 \\
+              &~||~a1(\epsilon)\leftrightsquigarrow b1(\epsilon)~||~a2(\epsilon)\leftrightsquigarrow b2(2~b3~EOF)~||~a3(\epsilon)\leftrightsquigarrow b3(4~EOF))                              && \mathit{by~\mathtt{E-EOFZAP}}                                   \\
+  \equiv      &~(va2)(vb2)(va3)(vb3)(print~\$~();~Nothing~||~\zapm~b2~ \\
+              &~||~a2(\epsilon)\leftrightsquigarrow b2(2~b3~EOF)~||~a3(\epsilon)\leftrightsquigarrow b3(4~EOF))                                                                                                                                                  \\
+  \rightarrow &~(va2)(vb2)(va3)(vb3)(print~\$~();~Nothing~||~\zapm~b2~||~\zapm~2~||~\zapm~b3~||~\zapm~EOF(a2) \\
+              &~||~a2(\epsilon)\leftrightsquigarrow b2(\epsilon)~||~a3(\epsilon)\leftrightsquigarrow b3(4~EOF))                                                                               && \mathit{by~3x\mathtt{E-ZAP}}                                    \\
+  \rightarrow &~(va2)(vb2)(va3)(vb3)(print~\$~();~Nothing~||~\zapm~b2~||~\zapm~b3~||~\zapm~a2 \\
+              &~||~a2(\epsilon)\leftrightsquigarrow b2(\epsilon)~||~a3(\epsilon)\leftrightsquigarrow b3(4~EOF))                                                                               && \mathit{by~\mathtt{E-EOFZAP}}                                   \\
+  \equiv      &~(va3)(vb3)(print~\$~();~Nothing~||~\zapm~b3 \\
+              &~||~a3(\epsilon)\leftrightsquigarrow b3(4~EOF))                                                                                                                                                                                                   \\
+  \rightarrow &~(va3)(vb3)(print~\$~();~Nothing~||~\zapm~b3~||~\zapm~4~||~\zapm~EOF(a3) \\
+              &~||~a3(\epsilon)\leftrightsquigarrow b3(\epsilon))                                                                                                                             && \mathit{by~3x\mathtt{E-ZAP}}                                    \\
+  \rightarrow &~(va3)(vb3)(print~\$~();~Nothing~||~\zapm~b3~||~\zapm~a3 \\
+              &~||~a3(\epsilon)\leftrightsquigarrow b3(\epsilon))                                                                                                                             && \mathit{by~\mathtt{E-EOFZAP}}                                   \\
+  \equiv      &~print~\$~();~Nothing                                                                                                                                                                                                                             \\
+  \rightarrow &~print~\$Nothing                                                                                                                                                               && \mathit{by~\mathtt{E-SEQNEXT}}                                  \\
+  \rightarrow &~()                                                                                                                                                               && \mathit{by~definition~of~print}
+\end{complexalign}
+
+\end{document}
