@@ -172,6 +172,38 @@ References:
   \item \href{https://jenkov.com/tutorials/java-nio/index.html}{Java Channels}
 \end{itemize}
 
+\section{Java Exceptions - Program development in Java}
+
+\begin{itemize}
+  \item Partial procedures are allowed to only use a subset of the arguments and ignore the others, while the caller has to make sure it does not provide arguments outside of this subset.
+  \item There is no guarantee that the arguments are in the subset so the procedure may loop forever or return an error result (which can be hard to debug).
+  \item The program should continue after the error in a similar way or at least halt with an informative error message, without causing damage to permanent data.
+  \item Total procedures should be used, informing the caller if the arguments are not in the subset necessary for the procedure to perform its function.
+  \item Returning a particular result is not a good option since the caller could ignore it by mistake or there might not even be a possible particular result available (when any result is possible).
+  \item An exception mechanism solves these problems and also allows the handling of these situations to be separated from the normal program control flow.
+  \item Procedures are documented with Requires, Modifies and Effects sections.
+  \item Checked exceptions need to be declared along with the procedure and code that calls the procedure needs to handle it. Failing this causes a compile-time error.
+  \item Unchecked exceptions are a subclass of RuntimeException and do not need to be declared with the procedure or handled (but they can).
+  \item When a procedure ends with an exception, control is given to code that handles the exception.
+  \item An exception is handled with the try-catch statement.
+  \item Multiple catch statements can be provided for the same try and multiple try statements can be nested. Exceptions not handled in an inner try can be handled by an outer try.
+  \item A procedure that calls another procedure that throws an unhandled exception propagates the exception if either the caller declares the exception or a supertype of it in its header, or the exception is unchecked. Otherwise there is a compile-time error.
+  \item To know the origin of an unchecked exception, we should narrow the scope of the try statement, so it has less code and the exception location is easier to debug.
+  \item Exceptions can be handled specifically or with a generic action, like reporting to the user and shutting down or restarting to an earlier state without fixing the exact problem.
+  \item Exceptions can be caught and thrown again with a different type and information.
+  \item Exceptions should be based on the function abstraction and not with how it is implemented.
+  \item Depending on how the exception mechanism is implemented, using them for controlling problem flow could be expensive.
+  \item Exceptions are not the same as errors. They are a mechanism that allows a method to bring some information to the attention of the caller.
+  \item The meaning of exceptional is arbitrary.
+  \item Exceptions should be used to eliminate most Requires clauses. Requires clauses should still be used if a requirement cannot be checked or would be too expensive to check.
+  \item By using an exception, we distinguish normal results from other results. Encoding results may be acceptable in private methods.
+  \item If you expect the caller to avoid calls that raise the exception, then it should be unchecked. Otherwise it should be checked, which means the caller needs to handle it.
+  \item FailureException should be thrown when the code checks an assumption that should hold but it doesn't (defensive programming).
+  \item Checks should always be made unless we can prove the error never happens or the checks are costly.
+\end{itemize}
+
+Reference: Barbara Liskov and John Guttag. 2000. Exceptions. \textit{In Program Development in Java: Abstraction, Specification, and Object-Oriented Design}, Addison-Wesley Professional, Courier Westford, United States, 57--76
+
 \section{Kotlin Exceptions and Channels}
 
 \begin{itemize}
