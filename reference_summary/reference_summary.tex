@@ -202,7 +202,7 @@ References:
   \item Checks should always be made unless we can prove the error never happens or the checks are costly.
 \end{itemize}
 
-Reference: Barbara Liskov and John Guttag. 2000. Exceptions. \textit{In Program Development in Java: Abstraction, Specification, and Object-Oriented Design}, Addison-Wesley Professional, Courier Westford, United States, 57--76
+Reference: Barbara Liskov and John Guttag. 2000. Exceptions. \textit{In Program Development in Java: Abstraction, Specification, and Object-Oriented Design}, Addison-Wesley Professional, Courier Westford, United States, 57--76.
 
 \section{Kotlin Exceptions and Channels}
 
@@ -389,6 +389,41 @@ References:
   \item \href{https://dev.to/imsushant12/multithreading-in-python-lifecycle-locks-and-thread-pools-3pg3}{Python Threads}
 \end{itemize}
 
+\section{Erlang Exceptions - Programming Erlang - Software for a Concurrent World}
+
+\begin{itemize}
+  \item Error handling is essential for robust distributed applications.
+  \item "Crashing" means the system raised an exception.
+  \item Exceptions are raised implicity due to an internal error or explicitly with built-in functions (BIFs) throw, exit or erlang:error.
+  \item Erlang uses try...of-catch-after-end to handle an exception, or enclosing the expression in a catch expression. It works like a case expression with more blocks. The after block is like the finally block in Java and its result is lost. The of block tries to match the result of the try block with the given patterns (if no exception was raised).
+  \item The of and after blocks can be omitted.
+  \item The BIFs are used in the patterns of the catch block to distinguish between the different exception forms.
+  \item The primitive catch expression transforms an exception into a tuple that describes the error, but loses precision in analyzing the caause of the problem when compared with try-catch. It is better to use try-catch, which was introcuded later to the language.
+  \item BIF exit terminates the process and broadcasts a message to all linked processes.
+  \item BIF throw is used when the caller may want to handle the exception.
+  \item BIF erlang:error is used for crashing errors that callers are not expected to handle and it includes the stack trace in its error message.
+  \item These BIFs can receive an atom that represents the exception type to thrown, which improves error messages and can be matched appropriately by code on the caller side.
+  \item try-catch has a value since everything in Erlang are expressions, so it can be assigned to a variable.
+  \item Alternatively, when error returns are common, a pair can be returned from the function which is either \{ok, Val\} or \{error, Why\} and the caller code either uses a case-of expression to handle the error like Rust's Result, or ignores the error case, which raises an exception if the function returns \{error, Why\}.
+  \item The latest stack trace can be obtained by calling erlang:get\_stacktrace while catching an exception.
+  \item Erlang has no shared memory. Processes have a private state and they communicate by sending messages. For a process to check if the other process received a message, it needs to send it a message asking if it received and understood it.
+  \item Pairs of processes can be linked together and if a process dies, it will send the reason of its death to the linked process.
+  \item Primitive spawn spawns a new process and returns its Pid, used to send messages to the process.
+  \item Function self returns the Pid of the current process, used so that the receiver can send a message back to the sender.
+  \item Processes can be registered with a name (atom) and its pid so that any other process can communicate with it.
+  \item Primitive receive waits for any message that matches one of the specified patterns. If the sender crashes or is for another reason unable to send a message, receive can have an after block as well, which includes a timeout in milliseconds to wait for a message, and if none arrives in that time, it executes the after block.
+  \item BIF link links 2 processes. If one dies, it sends a message to the other explaining why. To be more precise: a dying process broadcasts the exit signal to all processes in its link set. link raises an exit noproc exception if the Pid of the process to link to does not exist. BIF spawn\_link automatically links the newly spawned process to the current process.
+  \item BIF process\_flag(trap\_exit, true) turns the process into a system process, which does not terminate when a linked process exits, and it can process the exit reason of the dead linked process.
+  \item Remote handling of errors -> errors in one process can be handled in a different process that can even be in a different machine.
+  \item A process that successfully evaluated its function will exit with reason normal. Linked processes that are not system processes don't die if the reason is normal.
+  \item A process can explicitly send an exit signal to another process like it is dying (has some similarities with Haskell's throwTo function).
+  \item A process can send a kill exit signal, which kills the process it is sent to, even if they are system processes (only exit/2 does this; exit/1 can be trapped by linked system processes). The dying process broadcasts killed instead of kill to avoid the death of more processes than intended.
+  \item A monitor is an asymmetric link.
+  \item Server sockets are automatically closed if the server exits, and clients receive a message \{tcp\_closed, Socket\}.
+\end{itemize}
+
+Reference: Joe Armstrong. 2007. \textit{Programming Erlang - Software for a Concurrent World}. Pragmatic Bookshelf, United States of America.
+
 \section{FreeST Syntax - Polymorphic lambda calculus with context-free session types}
 
 \begin{itemize}
@@ -400,16 +435,18 @@ Reference: \href{https://www.sciencedirect.com/science/article/pii/S089054012200
 \section{Conclusions}
 
 \begin{itemize}
-  \item Exceptions are a class that can be extended/instantiated with new exceptions. But FreeST does not have type classes like Haskell.
+  \item Exceptions are often a class/datatype that can be extended/instantiated with new exceptions. But FreeST does not have type classes like Haskell.
   \item Only Java has checked exceptions by the compiler and methods need to declare in their signature all the checked exceptions that the method can throw.
   \item Rust does not have exceptions and resorts to a Either-like type (Result) for computations that can fail.
   \item There is a default uncaught exception handler that usually terminates the thread and logs an error message. Each thread can be given its own uncaught exception handler.
-  \item Haskell's throwTo function allows a thread to raise an exception in another thread, using its id.
-  \item All languages with exceptions have a try-catch-finally and throw syntax. OCaml uses try-with instead of try-catch and raise instead of throw. Haskell has functions try, catch and finally that receive blocks of code instead of using all 3 like the other languages. Python has an aditional block - else - which is executed after the try block, only if it succeeded.
+  \item Haskell's throwTo function allows a thread to raise an exception in another thread, using its id. Erlang can also throw an exception to another process in a similar fashion with the exit BIF.
+  \item All languages with exceptions have a try-catch-finally and throw syntax. OCaml uses try-with instead of try-catch and raise instead of throw. Haskell has functions try, catch and finally that receive blocks of code instead of using all 3 like the other languages. Python/Erlang have an aditional optional block - else/after - which is executed after the try block, only if it succeeded.
   \item Kotlin and OCaml have functions that automatically throw specific exceptions when called, reducing some of the boilerplate code.
   \item Rust, Haskell, OCaml and Scala have the Maybe/Option type. Maybe/Option can be used to return a Nothing/None result when a computation fails instead of a default value that we could not distinguish from a possible correct result of the function. The downside is that it does retain information about the cause of the error, unlike exceptions. The languages have a way to chain multiple computations that return Maybe/Option, using the wrapped results of the functions if they are Just/Some or immediately return Nothing/None if one of the functions fails, reducing multiple nested match cases.
   \item Rust, Haskell, OCaml and Scala have the Either/Result type. Exception handling with try-catch provides a better separation of concerns but can be more verbose than the Either/Result variant enhanced with chaining methods.
   \item Go does not have exceptions. It has errors that are treated just like values and can be wrapped inside other errors. Any type can be used as an error, including structs. Functions that can fail always return a pair with the result and an error, which can be or not nil. If it is not nil, functions errors.Is and errors.As can be used to check if there is an error value (or error type, respectively) inside the error tree. These functions are used in ifs to treat the errors. Errors can also be concatenated with errors.Join. Goroutines can either use a channel reserved for receiving errors or belong to an error group, which allows them to simply return an error if needed since calling Wait on the group will automatically return all the errors in the goroutines.
+  \item Erlang's exceptions are atoms (constants) that can go in a pair \{exception, reason\}. Erlang allows for a remote handling of errors: processes can be linked together and an error on one process is broadcasted to all processes in its link set. When a process receives this message it is also terminated, unless it was previously set to be a system process, in which case it can catch the exception during a receive and process it without dying (if the message is not a exit kill signal for this process). Links between pairs of processes can be symmetric or asymmetric.
+  \item Rust's recv\_timeout waits a given time for a message, returning if no message was received in that time with RecvTimeoutError::Timeout. Erlang's receive can have an optional block after which waits a given time for a message and if none arrives, executes the after block.
   \item In Rust, binary size from result-based handling is identical to no exception handling, while panic-based handling generated larger binaries due to panic-handling routines, panic formatting mechanisms and branching from panic paths.
   \item Forcing the user to think about exceptions and catching them in a generic block can get the system in a corrupt state instead of terminating the application, making it harder to debug.
   \item Most common error handling: empty, log, change object state configuration, throw, continue loop, return, rollback, close and assert.
@@ -422,31 +459,34 @@ Reference: \href{https://www.sciencedirect.com/science/article/pii/S089054012200
 \centering
 \begin{tblr}{
   colspec={X[l] *{9}{X[c]}},
-  rowspec={X[m] *{11}{X[m]}},
+  rowspec={X[m] *{12}{X[m]}},
   column{1}={wd=2.7cm}, column{2-Z}={wd=0.93cm},
   row{1}={guard}, row{2-Z}={ht=1cm, abovesep=0pt, belowsep=0pt},
   hline{1}={2-Z}{}, hline{2-Z}={},
   vline{1}={2-Z}{}, vline{2-Z}={}
 }
-                                 & Java & Kotlin & Scala & Python & Haskell & OCaml & Rust & Go & Erlang \\
-Exceptions                       & \x   & \x     & \x    & \x     & \x      & \x    &      &    &        \\
-Either/Result                    &      &        & \x    &        & \x      & \x    & \x   &    &        \\
-Error Values                     &      &        &       &        &         &       &      & \x &        \\
-try-catch-finally                & \x   & \x     & \x    & \x     & \x*     & \x    &      &    &        \\
-match-case                       &      &        & \x    &        & \x      & \x    & \x   &    &        \\
-if-else                          &      &        &       &        &         &       &      & \x &        \\
-Built-in Thrower Functions       &      & \x     &       &        &         & \x    & \x** &    &        \\
-Operation Chaining               &      &        & \x    &        & \x      & \x    & \x   &    &        \\
-Uncaught Exception Handler       & \x   & \x     & \x    & \x     & \x      & \x    & \x***&    &        \\
-Children Survive After Main Dies & \x   &        & \x    & \x     &         &       &      &    &        \\
-Children Raise to Parent         &      & \x     & \x    &        &         &       &      &    &        \\
+                                  & Java & Kotlin & Scala & Python & Erlang  & Haskell & OCaml & Rust   & Go  \\
+Exceptions                        & \x   & \x     & \x    & \x     & \x      & \x      & \x    &        &     \\
+Either/Result                     &      &        & \x    &        &         & \x      & \x    & \x     &     \\
+Error Values                      &      &        &       &        &         &         &       &        & \x  \\
+try-catch-finally                 & \x   & \x     & \x    & \x     & \x      & \x$^3$  & \x    &        &     \\
+match-case                        &      &        & \x    &        &         & \x      & \x    & \x     &     \\
+if-else                           &      &        &       &        &         &         &       &        & \x  \\
+Built-in Thrower Functions        &      & \x     &       &        &         &         & \x    & \x$^4$ &     \\
+Operation Chaining                &      &        & \x    &        &         & \x      & \x    & \x     &     \\
+Uncaught Exception Handler        & \x   & \x     & \x    & \x     &         & \x      & \x    & \x$^5$ &     \\
+Children Survive After Main Dies  & \x   &        & \x    & \x     & \x$^1$  &         &       &        &     \\
+Children Raise to Parent          &      & \x     & \x    &        & \x$^2$  &         &       &        &     \\
+Raise to Another Thread / Process &      &        &       &        & \x      & \x      &       &        &     \\
 \end{tblr}
 \end{table}
 
-* try catch and finally are functions, not syntax of the language
-
-** unwrap/expect functions, which call panic on Err
-
-*** panic handler: abort, halt, ...
+\begin{enumerate}
+  \item if children are not linked to main and main does not send an exit kill signal to a child that is not a system process
+  \item if linked
+  \item try catch and finally are functions, not syntax of the language
+  \item unwrap/expect functions, which call panic on Err
+  \item panic handler: abort, halt, ...
+\end{enumerate}
 
 \end{document}
