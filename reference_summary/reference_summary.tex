@@ -447,6 +447,12 @@ Reference: Dave Thomas. 2018. \textit{Programming Elixir $\ge$ 1.6 - Functional 
 
 Reference: \href{https://www.sciencedirect.com/science/article/pii/S0890540122001031}{FreeST Syntax}
 
+\section{Unused References}
+
+\begin{itemize}
+  \item \href{https://erlang.org/workshop/2004/exception.pdf}{Erlang's Exception Handling Revisited}
+\end{itemize}
+
 \section{Conclusions}
 
 \begin{itemize}
@@ -460,7 +466,7 @@ Reference: \href{https://www.sciencedirect.com/science/article/pii/S089054012200
   \item Rust, Haskell, OCaml and Scala have the Maybe/Option type. Maybe/Option can be used to return a Nothing/None result when a computation fails instead of a default value that we could not distinguish from a possible correct result of the function. The downside is that it does retain information about the cause of the error, unlike exceptions. The languages have a way to chain multiple computations that return Maybe/Option, using the wrapped results of the functions if they are Just/Some or immediately return Nothing/None if one of the functions fails, reducing multiple nested match cases.
   \item Rust, Haskell, OCaml and Scala have the Either/Result type. Exception handling with try-catch provides a better separation of concerns but can be more verbose than the Either/Result variant enhanced with chaining methods.
   \item Go does not have exceptions. It has errors that are treated just like values and can be wrapped inside other errors. Any type can be used as an error, including structs. Functions that can fail always return a pair with the result and an error, which can be or not nil. If it is not nil, functions errors.Is and errors.As can be used to check if there is an error value (or error type, respectively) inside the error tree. These functions are used in ifs to treat the errors. Errors can also be concatenated with errors.Join. Goroutines can either use a channel reserved for receiving errors or belong to an error group, which allows them to simply return an error if needed since calling Wait on the group will automatically return all the errors in the goroutines.
-  \item Erlang's exceptions are atoms (constants) that can go in a pair \{exception, reason\}. Erlang allows for a remote handling of errors: processes can be linked together and an error on one process is broadcasted to all processes in its link set. When a process receives this message it is also terminated, unless it was previously set to be a system process, in which case it can catch the exception during a receive and process it without dying (if the message is not a exit kill signal for this process). Links between pairs of processes can be symmetric or asymmetric.
+  \item Erlang's exceptions are atoms (constants) that belong to one of three classes: throw, exit or erlang:error. Erlang allows for a remote handling of errors: processes can be linked together and an error on one process is broadcasted to all processes in its link set. When a process receives this message it is also terminated, unless it was previously set to be a system process, in which case it can catch the exception during a receive and process it without dying (if the message is not a exit kill signal for this process). Links between pairs of processes can be symmetric or asymmetric.
   \item In Erlang and Elixir, exceptions are reserved for when the process is not expected to fail (handled, or not, with try-catch), while a pair of either \{ok, Val\} or \{error, Why\} is used for functions that are expected to possibly fail (handled with case).
   \item The proper way of building robust applications in Erlang and Elixir is not to have exception handling but to isolate functions that can fail in different processes and have a supervisor process that restarts its children based on how the system was configured.
   \item Rust's recv\_timeout waits a given time for a message, returning if no message was received in that time with RecvTimeoutError::Timeout. Erlang's receive can have an optional block after which waits a given time for a message and if none arrives, executes the after block.
@@ -496,14 +502,40 @@ Children Survive After Main Dies  & \x   &        & \x    & \x     & \x$^1$  & \
 Children Raise to Parent          &      & \x     & \x    &        & \x$^2$  & \x$^2$ &         &       &        &     \\
 Raise to Another Thread / Process &      &        &       &        & \x      & \x     & \x      &       &        &     \\
 \end{tblr}
+\caption{Summary of Exception Handling Properties of some Programming Languages}
 \end{table}
 
 \begin{enumerate}
-  \item if children are not linked to main and main does not send an exit kill signal to a child that is not a system process
-  \item if linked
+  \item If children are not linked to main and main does not send an exit kill signal to a child that is not a system process
+  \item If linked
   \item try catch and finally are functions, not syntax of the language
   \item unwrap/expect functions, which call panic on Err
-  \item panic handler: abort, halt, ...
+  \item Panic handler: abort, halt, ...
+\end{enumerate}
+
+\begin{table}[h!]
+\footnotesize
+\centering
+\begin{tblr}{
+  colspec={X[l] *{8}{X[c]}},
+  rowspec={X[m] *{5}{X[m]}},
+  column{1}={wd=2.7cm}, column{2-Z}={wd=0.93cm},
+  row{1}={guard}, row{2-Z}={ht=1cm, abovesep=0pt, belowsep=0pt},
+  hline{1}={2-Z}{}, hline{2-Z}={},
+  vline{1}={2-Z}{}, vline{2-Z}={}
+}
+                                  & Java & Kotlin & Scala & Python & Erlang  & Elixir & Haskell & OCaml \\
+Class / Type Class / Module       & \x   & \x     & \x    & \x     &         & \x     & \x      &       \\
+Atom / Constant                   &      &        &       &        & \x$^1$  & \x$^1$ &         &       \\
+Datatype Constructor              &      &        &       &        &         &        & \x      & \x    \\
+Exception Inheritance             & \x   & \x     & \x    & \x     &         &        & \x      &       \\
+Checked by Default                & \x   &        &       &        &         &        &         &       \\
+\end{tblr}
+\caption{Exception Representation of some Programming Languages}
+\end{table}
+
+\begin{enumerate}
+  \item These atoms can be of one of three classes throw, exit or erlang:error.
 \end{enumerate}
 
 \end{document}
