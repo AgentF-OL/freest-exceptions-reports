@@ -441,6 +441,27 @@ Reference: Joe Armstrong. 2007. \textit{Programming Erlang - Software for a Conc
 
 Reference: Dave Thomas. 2018. \textit{Programming Elixir $\ge$ 1.6 - Functional $|\!\!>$ Concurrent $|\!\!>$ Pragmatic $|\!\!>$ Fun}. Pragmatic Bookshelf, United States of America.
 
+\section{Checked Exceptions}
+
+\begin{itemize}
+  \item Statically checked exceptions help programmers remember to handle the exceptions, leading to more robust and reliable code. Aditionally, it also serves as a form of documentation.
+  \item On the other hand, checked exceptions are too rigid to support common design patterns.
+  \item Java and Swift use checked exceptions, unlike C++, C\#, Scala and Haskell.
+  \item A new mechanism was designed to merge the benefits of static checking with the flexibility of unchecked exceptions, and it works well with higher-order functions and design patterns.
+  \item Checked and unchecked is no longer a property of the type but a property of the context of the exception.
+  \item Some problems of using checked exceptions with higher-order functions is providing a function that can produce an exception as argument to another function that should not need to handle these exceptions (only the caller should), and there can be a clash between the exceptions raised from the function used as argument and the exceptions caught in the implementation of the former function (exception capture, similar idea to variable capture).
+  \item An exception should be checked in a context that is not oblivious to the exception and is able to handle it. An exception should be unchecked if the context is oblivious to it.
+  \item Methods that want to propagate an exception to the caller use a throws clause in the signature and the exception propagates in checked mode, which does not collect the stack trace.
+  \item Methods that want to indicate that an exception should never happen use a fails clause in the implementation and the exception propagates in failure mode, which collects the stack trace so the programmer can debug the origin of the failure. This is less efficient, but these failures are not excepted.
+  \item To prevent exception capture, exceptions in failure mode are not caught by normal catch clauses. Instead, catch all can be used to catch any exceptions of a given type, regardless of propagation mode.
+  \item weak methods/classes allow overriding methods to declare new exceptions, but they still have to follow the specification of the original method for everything else.
+  \item Exceptions switch from checked mode to tunneling mode when the caller is oblivious to the exception, and it goes up the stack until it reaches a caller that can handle the exception, where it is transformed back to checked mode and can be caught, rethrown or transformed into failure mode.
+  \item At runtime, an exception is identified by its type and blame label, which pinpoints what part of the program is responsible for it.
+  \item An exception mismatch between the parameters of a function call and the function call, establish the blame label on the function call.
+\end{itemize}
+
+Reference: Yizhou Zhang, Guido Salvaneschi, Quinn Beightol, Barbara Liskov, and Andrew C. Myers. 2016. Accepting blame for safe tunneled exceptions. In Proceedings of the 37th ACM SIGPLAN Conference on Programming Language Design and Implementation (PLDI '16). Association for Computing Machinery, New York, NY, USA, 281--295. \href{https://doi.org/10.1145/2908080.2908086}{https://doi.org/10.1145/2908080.2908086}
+
 \section{FreeST Syntax - Polymorphic lambda calculus with context-free session types}
 
 \begin{itemize}
@@ -459,7 +480,7 @@ Reference: \href{https://www.sciencedirect.com/science/article/pii/S089054012200
 
 \begin{itemize}
   \item Exceptions are often a class/datatype that can be extended/instantiated with new exceptions. But FreeST does not have type classes like Haskell.
-  \item Only Java has checked exceptions by the compiler and methods need to declare in their signature all the checked exceptions that the method can throw.
+  \item Java and Swift have checked exceptions by the compiler and methods need to declare in their signature all the checked exceptions that the method can throw. This avoids programmers forgetting to handle exceptions, leading to more robust and reliable code and helping with documentation, but they are not flexible enough to support common design patterns and higher-order functions. Implementing propagation modes for exceptions (checked, failure and tunneling) and blame labels for where an exception needs to be handled in some way could help solve the issues of checked exceptions, while keeping its benefits.
   \item Rust does not have exceptions and resorts to a Either-like type (Result) for computations that can fail.
   \item There is a default uncaught exception handler that usually terminates the thread and logs an error message. Each thread can be given its own uncaught exception handler.
   \item Haskell's throwTo function allows a thread to raise an exception in another thread, using its id. Erlang can also throw an exception to another process in a similar fashion with the exit BIF.
