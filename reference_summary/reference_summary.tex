@@ -24,6 +24,8 @@
 \usepackage{tabularray} % for tables
 \UseTblrLibrary{siunitx}
 
+\usepackage{pdflscape} % for landscape pages
+
 % Align
 \NewEnviron{complexalign}
   {
@@ -477,6 +479,8 @@ Reference: \href{https://www.sciencedirect.com/science/article/pii/S089054012200
   \item Programmers are concerned with throwing the exceptions that best fit the situation, but not so concerned with implementing handling code.
 \end{itemize}
 
+\begin{landscape}
+
 \begin{table}[h!]
 \footnotesize
 \centering
@@ -485,8 +489,10 @@ Reference: \href{https://www.sciencedirect.com/science/article/pii/S089054012200
   rowspec={X[m] *{12}{X[m]}},
   column{1}={wd=2.7cm}, column{2-Z}={wd=0.93cm},
   row{1}={guard}, row{2-Z}={ht=1cm, abovesep=0pt, belowsep=0pt},
-  hline{1}={2-Z}{}, hline{2-Z}={},
-  vline{1}={2-Z}{}, vline{2-Z}={}
+  hline{2}={1-Z}{},
+  vline{2}={1-Z}{}
+  %hline{1}={2-Z}{}, hline{2-Z}={},
+  %vline{1}={2-Z}{}, vline{2-Z}={}
 }
                                   & Java & Kotlin & Scala & Python & Erlang  & Elixir & Haskell & OCaml & Rust   & Go  \\
 Exceptions                        & \x   & \x     & \x    & \x     & \x      & \x     & \x      & \x    &        &     \\
@@ -505,6 +511,8 @@ Raise to Another Thread / Process &      &        &       &        & \x      & \
 \caption{Summary of Exception Handling Properties of some Programming Languages}
 \end{table}
 
+\end{landscape}
+
 \begin{enumerate}
   \item If children are not linked to main and main does not send an exit kill signal to a child that is not a system process
   \item If linked
@@ -521,8 +529,10 @@ Raise to Another Thread / Process &      &        &       &        & \x      & \
   rowspec={X[m] *{5}{X[m]}},
   column{1}={wd=2.7cm}, column{2-Z}={wd=0.93cm},
   row{1}={guard}, row{2-Z}={ht=1cm, abovesep=0pt, belowsep=0pt},
-  hline{1}={2-Z}{}, hline{2-Z}={},
-  vline{1}={2-Z}{}, vline{2-Z}={}
+  hline{2}={1-Z}{},
+  vline{2}={1-Z}{}
+  %hline{1}={2-Z}{}, hline{2-Z}={},
+  %vline{1}={2-Z}{}, vline{2-Z}={}
 }
                                   & Java & Kotlin & Scala & Python & Erlang  & Elixir & Haskell & OCaml \\
 Class / Type Class / Module       & \x   & \x     & \x    & \x     &         & \x     & \x      &       \\
