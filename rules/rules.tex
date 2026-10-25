@@ -155,6 +155,7 @@
 \setlength{\parskip}{1ex}
 \setlength{\parindent}{0pt}
 \thispagestyle{empty}
+\tableofcontents
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -250,5 +251,47 @@ $()~||~\C~\eq~\C$
   & \text{E-RAISE}          &~ \run{P}{\rraise}                                                               &~ \rightarrow \zap P                                                                                                \\
   & \text{E-LIFT}           &~ \run{\G}{\C}                                                                   &~ \rightarrow \run{\G}{\D}, \quad \text{if}~\C \rightarrow \D
 \end{align*}
+
+\section{Some Thoughts about Shared Channel Cancellation}
+
+\subsection{Counter}
+
+\begin{itemize}
+  \item Each side of the buffer keeps a counter for the number of threads with ownership of the endpoint. When one endpoint reaches a counter of $0$, the owners of the other endpoint raise an exception when calling receive\_.
+  \item When to increase and decrease the counter?
+  \item The counter would decrease after a thread calls cancel on the endpoint. But what if a thread forgets to call cancel? The other side would hang on receive\_ because the counter never reaches $0$. Also, nothing stops a thread from using the channel again after cancelling, but this shouldn't be a problem if the buffers are cleared at the end of execution. Should all shared channel endpoints in the type context of the thread be cancelled after the thread ends?
+  \item The counter would increase at the moment of the fork. But to know which counters to increase, there needs to be way to check which endpoints are being used in the function provided as argument to fork. And what about the thread that creates the channel? It might or might not use the channel. We could start the counters at $1$ on creation, but then the creator thread would have to explicitly cancel both endpoints if it won't use them. This not only adds boilerplate code, but it could also lead to unintended garbage collection of the channel, since both endpoints would reach a counter of $0$.
+  \item The counter alone is not enough.
+\end{itemize}
+
+\subsection{Register First}
+
+\begin{itemize}
+  \item There could be a new BIF to register a thread as a user of the endpoint. This would increment the counter in the buffer for the endpoint. BIF cancel would then decrease the counter.
+  \item But what if it is never explicitly cancelled? The counter would never decrease so the clients would still wait forever on receive\_. Also, having to register every thread would lead to more boilerplate code, but Erlang does something similar anyway.
+  \item Calling register more than once on the same endpoint should have no effect, so that it can be called at the start of a recursive function.
+\end{itemize}
+
+\subsection{Store Shared Channels}
+
+\begin{itemize}
+  \item Each thread could store a list of shared channels that it is registered with, and when the thread terminates for whatever reason, all channels in the list are implicitly cancelled. An explicit cancel would also remove from this list besides decreasing the counter.
+  \item But a thread stuck in a loop never terminates, so the endpoints would still not be cancelled. Unless we can detect threads stuck in a loop, we are stuck with this problem. We could ignore it, but that means we would have to trust that programmers won't mess up...
+\end{itemize}
+
+\subsection{Increase Counter on send\_ instead of fork}
+
+\begin{itemize}
+  \item Not a good idea. The same thread could send twice, but only cancel the endpoint once at the end. On the other hand, if the counter only increases on send\_, the counter would not be needed anymore since the client could just check the buffer.
+\end{itemize}
+
+\subsection{Is cancelling necessary for shared channels anyway?}
+
+\begin{itemize}
+  \item The original reason to add a new BIF cancel was to deal with linear channels: they have to be used exactly once until the end of the protocol, but the protocol would never finish if an exception was raised.
+  \item Shared channels can be used $0$ times. The protocol does not need to be cancelled. The problem that the previous ideas tried to solve was clients hanging on receive\_ (and pattern matching with unrestricted labels) when no servers are available. A common pattern for this is using timeout and retries (reference needed). This could be an alternate version of receive\_ or there could be a new block in the try expression: try receive\_ c after T retry x... The after retry block would be executed if receive\_ is not successful in T milliseconds for x attempts.
+  \item Erlang has an after block. Ruby might have something similar to after and retry blocks, but this needs to be studied.
+  \item This sounds like the most promising solution. cancel would only work on linear channels. This new syntax inevitably increases code size.
+\end{itemize}
 
 \end{document}
