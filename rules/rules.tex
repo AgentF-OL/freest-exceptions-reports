@@ -222,9 +222,9 @@ $(va)(vb)\C~\eq~(vb)(va)\C$
 $a(\vv) \buf b(\ww)~\eq~b(\ww) \buf a(\vv)$
 \hfill
 $()~||~\C~\eq~\C$
-%\begin{center}
-%  $(va)(vb)(\zap a~||~\zap b~||~a(\empt) \buf b(\empt))~||~\C~\eq~\C$
-%\end{center}
+\begin{center}
+  $(va)(vb)(\zap a~||~\zap b~||~a(\empt) \buf b(\empt))~||~\C~\eq~\C$
+\end{center}
 
 \textbf{Configuration Reduction} \hfill \fbox{$\C \rightarrow \D$}
 \begin{align*}
@@ -237,7 +237,7 @@ $()~||~\C~\eq~\C$
   & \text{E-SENDTYPE}       &~ \run{\F}{\sendType~@U~a}~||~a(\vv) \buf b(\ww)                                 &~ \rightarrow \run{\F}{a}~||~a(\vv) \buf b(\ww \cdot @U)                                                    \\
   & \text{E-RECEIVETYPE}    &~ \run{\F}{\receiveType~a}~||~a(@U \cdot \vv) \buf b(\ww)                        &~ \rightarrow \run{\F}{(@U,a)}~||~a(\vv) \buf b(\ww)                                                        \\
   & \text{E-CLOSE}          &~ \run{\F}{\close~a}~||~a(\empt) \buf b(\ww)                                     &~ \rightarrow \run{\F}{()}~||~\zap a~||~a(\empt) \buf b(\ww \cdot \eos)                                     \\
-  & \text{E-WAIT}           &~ (va)(vb)(\run{\F}{\wait~a}~||~a(\eos) \buf b(\empt))                           &~ \rightarrow \run{\F}{()}~||~\zap a                                                                        \\
+  & \text{E-WAIT}           &~ \run{\F}{\wait~a}~||~a(\eos) \buf b(\empt)                                     &~ \rightarrow \run{\F}{()}~||~\zap a~||~a(\empt) \buf b(\empt)                                              \\
   & \text{E-SELECTLIN}      &~ \run{\F}{\select_\lin~\lbl~a}~||~a(\vv) \buf b(\ww)                            &~ \rightarrow \run{\F}{a}~||~a(\vv) \buf b(\ww \cdot \lbl)                                                  \\
   & \text{E-SELECTUN}       &~ \run{\F}{\select_\un~\lbl~a}~||~a(\vv) \buf b(\ww)                             &~ \rightarrow \run{\F}{()}~||~a(\vv) \buf b(\ww \cdot \lbl)                                                 \\
   & \text{E-CASE} \quad~~ \lefteqn{\run{\F}{\caseLabel{i}{n}{\m}{\lbl}{a}{M}}~||~a(\lbl_j \cdot \vv) \buf b(\ww) \rightarrow \run{\F}{M_j}~||~a_j(\vv) \buf b(\ww)}                                                        \\
