@@ -231,7 +231,7 @@ $(va)(vb)(\zap a~||~a(\empt) \buf b(\empt))~||~\C~\eq~\C$
 \textbf{Configuration Reduction} \hfill \fbox{$\C \rightarrow \D$}
 \begin{align*}
   & \text{E-CHANNEL} \quad\quad\quad\quad \lefteqn{\run{\F}{\channel~@U}                                         \rightarrow (va)(vb)(\run{\F}{(a,b)})~||~a(\empt) \buf b(\empt), \quad \text{where}~a,b~\text{are fresh}} \\
-  & \text{E-FORK}           &~ \run{\F}{\fork~(\lambda \_.M)}                                                 &~ \rightarrow \run{\F}{()}~||~M                                                                             \\
+  & \text{E-FORK}           &~ \run{\F}{\fork~(\lambda x.M)}                                                  &~ \rightarrow \run{\F}{()}~||~M\{()/x\}                                                                     \\
   & \text{E-SENDLIN}        &~ \run{\F}{\send_\lin~U~a}~||~a(\vv) \buf b(\ww)                                 &~ \rightarrow \run{\F}{a}~||~a(\vv) \buf b(\ww \cdot U)                                                     \\
   & \text{E-RECEIVELIN}     &~ \run{\F}{\receive_\lin~a}~||~a(U \cdot \vv) \buf b(\ww)                        &~ \rightarrow \run{\F}{(U,a)}~||~a(\vv) \buf b(\ww)                                                         \\
   & \text{E-SENDUN}         &~ \run{\F}{\send_\un~U~a}~||~a(\vv) \buf b(\ww)                                  &~ \rightarrow \run{\F}{()}~||~a(\vv) \buf b(\ww \cdot U)                                                    \\
