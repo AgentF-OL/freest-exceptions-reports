@@ -230,3 +230,66 @@
   note      = {Accessed: 2025-09-05}
 }
 
+@misc{freest,
+  author       = {FreeST Team},
+  title        = {FreeST},
+  year         = {2023},
+  howpublished = {\url{https://freest-lang.github.io/}},
+  note         = {Accessed: 2026-10-28},
+}
+
+@inbook{javabook,
+  author = {Barbara Liskov and John Guttag},
+  title = {Program Development in Java: Abstraction, Specification, and Object-Oriented Design},
+  chapter = {Exceptions},
+  pages = {57--76},
+  publisher = AddisonWesley,
+  address = {Boston, Massachusetts, USA},
+  year = {2000},
+  isbn = {978-0-201-65768-5},
+}
+
+@article{exceptionssessiontypes,
+  author = {Fowler, Simon and Lindley, Sam and Morris, J. Garrett and Decova, S{\'a}ra},
+  title = {Exceptional asynchronous session types: session types without tiers},
+  year = {2019},
+  issue_date = {January 2019},
+  publisher = {Association for Computing Machinery},
+  address = {New York, NY, USA},
+  volume = {3},
+  number = {POPL},
+  url = {https://doi.org/10.1145/3290341},
+  doi = {10.1145/3290341},
+  abstract = {Session types statically guarantee that communication complies with a protocol. However, most accounts of session typing do not account for failure, which means they are of limited use in real applications---especially distributed applications---where failure is pervasive.  We present the first formal integration of asynchronous session types with exception handling in a functional programming language. We define a core calculus which satisfies preservation and progress properties, is deadlock free, confluent, and terminating.  We provide the first implementation of session types with exception handling for a fully-fledged functional programming language, by extending the Links web programming language; our implementation draws on existing work on effect handlers. We illustrate our approach through a running example of two-factor authentication, and a larger example of a session-based chat application where communication occurs over session-typed channels and disconnections are handled gracefully.},
+  journal = {Proc. ACM Program. Lang.},
+  month = jan,
+  articleno = {28},
+  numpages = {29},
+  keywords = {web programming, session types, exceptions, asynchrony}
+}
+
+@book{exceptionhandling,
+  author = {Pedro Mejia Alvarez, Raul E. Gonzalez Torres, Susana Ortega Cisneros},
+  title = {Exception Handling: Fundamentals and Programming},
+  publisher = {Springer Nature Switzerland AG},
+  address = {Gewerbestrasse 11, 6330 Cham, Switzerland},
+  year = {2024},
+  isbn = {978-3-031-50681-9},
+}
+
+@inproceedings{ehfieldstudy,
+  author = {Cabral, Bruno and Marques, Paulo},
+  title = {Exception handling: a field study in Java and .NET},
+  year = {2007},
+  isbn = {3540735887},
+  publisher = {Springer-Verlag},
+  address = {Berlin, Heidelberg},
+  abstract = {Most modern programming languages rely on exceptions for dealing with abnormal situations. Although exception handling was a significant improvement over other mechanisms like checking return codes, it is far from perfect. In fact, it can be argued that this mechanism is seriously limited, if not, flawed. This paper aims to contribute to the discussion by providing quantitative measures on how programmers are currently using exception handling. We examined 32 different applications, both for Java and .NET. The major conclusion for this work is that exceptions are not being correctly used as an error recovery mechanism. Exception handlers are not specialized enough for allowing recovery and, typically, programmers just do one of the following actions: logging, user notification and application termination. To our knowledge, this is the most comprehensive study done on exception handling to date, providing a quantitative measure useful for guiding the development of new error handling mechanisms.},
+  booktitle = {Proceedings of the 21st European Conference on Object-Oriented Programming},
+  pages = {151--175},
+  numpages = {25},
+  keywords = {programming languages, exception handling mechanisms},
+  location = {Berlin, Germany},
+  series = {ECOOP'07}
+}
+

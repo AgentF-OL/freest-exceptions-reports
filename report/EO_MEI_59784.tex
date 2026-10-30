@@ -33,6 +33,11 @@
 \usepackage{environ}
 \usepackage{xcolor}
 \usepackage{tcolorbox}
+\usepackage{fontawesome7} % for the zap icon
+\usepackage{pifont} % for the checkmarks
+\usepackage{tabularray} % for tables
+\UseTblrLibrary{siunitx}
+\usepackage{pdflscape} % for landscape pages
 
 % Template
 \NewEnviron{template}
@@ -41,6 +46,82 @@
       \BODY
     \end{tcolorbox}
   }
+
+\newcommand{\zap}{\text{\faBoltLightning}}
+
+\newcommand{\un}{\text{un}}
+\newcommand{\lin}{\text{lin}}
+\newcommand{\Skip}{\text{Skip}}
+\newcommand{\Dual}{\text{Dual}}
+\newcommand{\fn}{\text{fn}}
+
+\newcommand{\mbf}[1]{\mathbf{#1}}
+\newcommand{\channel}{\mbf{channel}}
+\newcommand{\fork}{\mbf{fork}}
+\newcommand{\forkWith}{\mbf{forkWith}}
+\newcommand{\send}{\mbf{send}}
+\newcommand{\receive}{\mbf{receive}}
+\newcommand{\close}{\mbf{close}}
+\newcommand{\wait}{\mbf{wait}}
+\newcommand{\sendType}{\mbf{sendType}}
+\newcommand{\receiveType}{\mbf{receiveType}}
+\newcommand{\select}{\mbf{select}}
+\newcommand{\case}{\mbf{case}}
+\newcommand{\caseLabel}[6]{\mbf{case}~#5~\mbf{of}~\{#3\&#4_#1~#5_#1 \rightarrow #6_#1\}^{#1 \in 1..#2}}
+\newcommand{\cancel}{\mbf{cancel}}
+\newcommand{\rraise}{\mbf{raise}}
+\newcommand{\try}[2]{\mbf{try}~#1~\mbf{otherwise}~#2}
+\newcommand{\tryin}[4]{\mbf{try}~#1~\mbf{as}~#2~\mbf{in}~#3~\mbf{otherwise}~#4}
+\newcommand{\lett}[3]{\mbf{let}~#1 = #2~\mbf{in}~#3}
+\newcommand{\Ckind}{\mbf{C}}
+\newcommand{\Skind}{\mbf{S}}
+\newcommand{\Tkind}{\mbf{T}}
+\newcommand{\End}{\text{End}}
+\newcommand{\Close}{\text{Close}}
+\newcommand{\Wait}{\text{Wait}}
+
+\newcommand{\mcal}[1]{\mathcal{#1}}
+\newcommand{\eq}{\equiv}
+\newcommand{\C}{\mcal{C}}
+\newcommand{\D}{\mcal{D}}
+\newcommand{\E}{\mcal{E}}
+\newcommand{\F}{\mcal{F}}
+\newcommand{\G}{\mcal{G}}
+\newcommand{\m}{\textit{\text{m}}}
+\newcommand{\bkind}{\upsilon}
+\newcommand{\kind}{\kappa}
+\newcommand{\T}{\textit{\text{T}}}
+\newcommand{\labelset}{\text{L}}
+\newcommand{\thread}{\mcal{k}}
+
+\newcommand{\run}[2]{#1~[#2]}
+
+\newcommand{\toparrow}[1]{\overrightarrow{#1}}
+\renewcommand{\vv}{\toparrow{V}}
+\newcommand{\ww}{\toparrow{W}}
+\newcommand{\buf}[5]{#1(#2) \overset{#3}{\leftrightsquigarrow} #4(#5)}
+\newcommand{\eos}{\text{EOS}}
+
+\newcommand{\pol}{\sharp}
+\newcommand{\view}{\scalerel*{\bigstar}{\kind}}
+\newcommand{\viewsend}{\oplus}
+\newcommand{\viewreceive}{\text{\&}}
+\newcommand{\lbl}{\ell}
+\newcommand{\record}{\{\lbl\! : \T_\lbl\}_{\lbl \in \labelset}}
+\newcommand{\variant}{\langle \lbl\! : \T_\lbl\rangle_{\lbl \in \labelset}}
+\newcommand{\foralll}[3]{\forall #1\! : #2~.~#3}
+\newcommand{\recursion}[3]{\mu #1\! : #2.#3}
+
+\newcommand{\typectx}{\Gamma}
+\newcommand{\kindctx}{\Delta}
+\newcommand{\bind}[3]{#1,#2\! : #3}
+\newcommand{\empt}{\scalerel*{\mcal{E}}{\epsilon}}
+\newcommand{\typing}[3]{#1 \vdash #2\! : #3}
+
+\newcommand{\abs}[4]{\lambda_#1 #2\! : #3.#4}
+\newcommand{\pair}[2]{#1 \times #2}
+
+\newcommand{\rrule}[1]{\textsc{\text{#1}}}
 
 %% end of the preamble, start of the body of the document source.
 \begin{document}
@@ -91,11 +172,48 @@
   \noindent\textbf{Outline.} How is the rest of the document structured? \\The remainder of this document is organised as follows. Section \ref{sec:background} presents bla bla bla. ...
 \end{template}
 
+Exception mechanisms have been integrated in many programming languages to deal with unexpected events at runtime~\cite{exceptionhandling}. Unlike errors, exceptions allow a method to bring some information to the attention of the caller, propagating up the call stack until a method is found that can handle the exception~\cite{javabook}. Session types provide compile-time guarantees that communication between threads follows an established protocol~\cite{exceptionssessiontypes}. FreeST is a concurrent programming language based on session types that is yet to properly handle failures~\cite{freest}.
+
+Previous efforts have been made to handle failures in programming languages with session types~\cite{exceptionssessiontypes}. This paper extends those efforts to cover all the constructs and features of the FreeST programming language.
+
+The main goal of this project is to enhance the FreeST compiler with exceptions and exception handling mechanisms, so that FreeST programs can be robust and reliable, even in the face of failures during the communication protocols. This will also provide valuable progress to future implementations of distributed applications in FreeST, which are very prone to failures~\cite{exceptionssessiontypes} (e.g. network connection problems and crashes). Additionaly, the new mechanisms must be practical from the point of view of the programmer: well integrated with the language without getting in the way, intuitive based on other programming languages, and simple without too much boilerplate code.
+
+The remainder of this paper is organized as follows. Section 2 presents..............
+
 \section{Background} \label{sec:background}
 
 \begin{template}
   In this section, you should describe the scientific or technological context of your project. Provide enough information so that a reader unfamiliar with the topic can understand the problem you are addressing and the rationale for your project. This may include relevant concepts and definitions in the area, particularly those that will be used throughout this document.
 \end{template}
+
+To better understand the context of this project, it is important to highlight some definitions that will be used throughout this paper, namely exceptions, exception handling and the FreeST programming language.
+
+Exceptions~\cite{exceptionhandling} are unexpected runtime events that lead to undesirable behaviour, which can result from code or logic errors, invalid user input, hardware or resource problems such as running out of memory, and external factors, for instance, network connection problems. Exceptions encapsulate information about the cause of the event and other information that can be useful for debugging the program (e.g. the location of the event in the code).
+
+Exception handling~\cite{exceptionhandling} allows the issue to be fixed at runtime so that the program can resume execution, or terminate gracefully without causing harm. Common ways to handle exceptions~\cite{ehfieldstudy} include logging the error message, rethrowing the exception to the caller, continuing a loop, stopping the execution of the method and returning to the caller, rollbacking the effects of the code that led to the exception, changing an object state to a static default, a combination of these, and simply ignoring the error. After executing code that can lead to an exception, it is often helpful to have code dedicated to closing resources or making asserts that the properties of the program still hold, regardless if the code caused an exception or not.
+
+FreeST~\cite{freest} is a functional programming language for safe concurrency powered by context-free session types.
+In FreeST, processes communicate by passing messages through bidirectional channels, which maintain a buffer of messages.
+A channel is composed of two endpoints, one for each side of the communication.
+Each channel follows a communication protocol that is itself a type that can be composed sequentially (e.g. ?Int ; !Bool is a protocol type for a session type that receives an integer and sends a boolean).
+The protocol described by one endpoint of a session type is the dual counterpart of the other endpoint (e.g. when one endpoint is used to send an integer - !Int - the other is used to receive an integer - ?Int).
+Communication is safe because these endpoints are linear, which means they must be used exactly once, and sending or receiving from an endpoint returns the endpoint that carries the continuation of the protocol (e.g. after sending an integer to an endpoint of type !Int ; ?Bool, an endpoint of type ?Bool is returned, which must, in turn, be used exactly once as well).
+This way, the communication on well-typed programs has no mismatched or missing messages.
+Output operations on channels are asynchronous, while input operations are synchronous, blocking until the buffer contains a message.
+At the end of communication on linear channels, one endpoint is responsible for closing the channel (output), while the other must wait for the channel to close (input).
+A complete protocol for a channel could then be, for example, !Int ; ?Bool ; Close and its dual type would be ?Int ; !Bool ; Wait.
+FreeST protocols can also contain choices which allow the sender side to select the label $\lbl$ that corresponds to the path $\T$ it wants to continue on (type of the sender: $\viewsend\{\lbl_1\!: \T_1,~\lbl_2\!: \T_2,~\ldots\}$ , type of receiver: $\viewreceive\{\lbl_1\!: \Dual~\T_1,~\lbl_2\!: \Dual~\T_2,~\ldots\}$).
+FreeST includes BIFs (Built-in Functions) to manipule channel endpoints.
+$\send$ and $\receive$ send and receive from a linear channel.
+$\sendType$ and $\receiveType$ send and receive types from a linear channel.
+$\close$ and $\wait$ close and wait for the closing of linear channels.
+$\select$ selects the label from a set of choices from which to continue the protocol and a $\case$ expression can be used on the other side to handle each possible choice.
+Besides linear channels, FreeST also provides shared channels, which are unrestricted, so they can be used any number of times (including $0$).
+These are often used to establish a linear session between a client and server by sending and receiving a linear channel inside a shared channel, shared by multiple clients and servers.
+Shared channel types start with a `$*$' symbol (e.g. $*$!Int and $*\viewreceive\{\lbl\!: \T\}$) and there is no protocol for sending / receiving types and closing / waiting.
+Shared channel BIFs end with a `\_' symbol ($\send\_$, $\receive\_$ and $\select\_$) and the $\case$ expression is also available for unrestricted choices on the receiver side.
+FreeST types have types themselves, called kinds.
+Kinds are composed of a base kind ($\Tkind$ for any type, $\Skind$ for session types, and $\Ckind$ for channel types, which are closed at the end) and multiplicity ($\lin$ for linear and $\un$ for unrestricted).
 
 \section{Related Work} \label{sec:relatedwork}
 
