@@ -484,7 +484,7 @@ Reference: \href{https://www.sciencedirect.com/science/article/pii/S089054012200
   \item Rust does not have exceptions and resorts to a Either-like type (Result) for computations that can fail.
   \item There is a default uncaught exception handler that usually terminates the thread and logs an error message. Each thread can be given its own uncaught exception handler.
   \item Haskell's throwTo function allows a thread to raise an exception in another thread, using its id. Erlang can also throw an exception to another process in a similar fashion with the exit BIF.
-  \item All languages with exceptions have a try-catch-finally and throw syntax. OCaml uses try-with instead of try-catch and raise instead of throw. Haskell has functions try, catch and finally that receive blocks of code instead of using all 3 like the other languages. Python/Erlang have an aditional optional block - else/after - which is executed after the try block, only if it succeeded.
+  \item All languages with exceptions have a try-catch-finally and throw syntax. OCaml uses try-with instead of try-catch and raise instead of throw. Haskell has functions try, catch and finally that receive blocks of code instead of using all 3 like the other languages. Python has an aditional optional block - else - which is executed after the try block, only if it succeeded.
   \item Kotlin and OCaml have functions that automatically throw specific exceptions when called, reducing some of the boilerplate code.
   \item Rust, Haskell, OCaml and Scala have the Maybe/Option type. Maybe/Option can be used to return a Nothing/None result when a computation fails instead of a default value that we could not distinguish from a possible correct result of the function. The downside is that it does retain information about the cause of the error, unlike exceptions. The languages have a way to chain multiple computations that return Maybe/Option, using the wrapped results of the functions if they are Just/Some or immediately return Nothing/None if one of the functions fails, reducing multiple nested match cases.
   \item Rust, Haskell, OCaml and Scala have the Either/Result type. Exception handling with try-catch provides a better separation of concerns but can be more verbose than the Either/Result variant enhanced with chaining methods.
@@ -515,19 +515,19 @@ Reference: \href{https://www.sciencedirect.com/science/article/pii/S089054012200
   %hline{1}={2-Z}{}, hline{2-Z}={},
   %vline{1}={2-Z}{}, vline{2-Z}={}
 }
-                                  & Java & Kotlin & Scala & Python & Erlang  & Elixir & Haskell & OCaml & Rust   & Go  \\
-Exceptions                        & \x   & \x     & \x    & \x     & \x      & \x     & \x      & \x    &        &     \\
-Either / Result / Tuple           &      &        & \x    &        & \x      & \x     & \x      & \x    & \x     &     \\
-Error Values                      &      &        &       &        &         &        &         &       &        & \x  \\
-try-catch-finally                 & \x   & \x     & \x    & \x     & \x      & \x     & \x$^3$  & \x    &        &     \\
-match-case                        &      &        & \x    &        & \x      & \x     & \x      & \x    & \x     &     \\
-if-else                           &      &        &       &        &         &        &         &       &        & \x  \\
-Built-in Thrower Functions        &      & \x     &       &        &         &        &         & \x    & \x$^4$ &     \\
-Happy Path Programming            &      &        & \x    &        &         &        & \x      & \x    & \x     &     \\
-Uncaught Exception Handler        & \x   & \x     & \x    & \x     & \x      & \x     & \x      & \x    & \x$^5$ &     \\
-Children Survive After Main Dies  & \x   &        & \x    & \x     & \x$^1$  & \x$^1$ &         &       &        &     \\
-Children Raise to Parent          &      & \x     & \x    &        & \x$^2$  & \x$^2$ &         &       &        &     \\
-Raise to Another Thread / Process &      &        &       &        & \x      & \x     & \x      &       &        &     \\
+                                  & Java & Kotlin & Python & Scala & Erlang  & Elixir & Haskell & OCaml & Rust   & Go     \\
+Exceptions                        & \x   & \x     & \x     & \x    & \x      & \x     & \x      & \x    &        &        \\
+Either / Result / Tuple           &      &        &        & \x    & \x      & \x     & \x      & \x    & \x     &        \\
+Error Values                      &      &        &        &       &         &        &         &       &        & \x     \\
+try-catch-finally                 & \x   & \x     & \x     & \x    & \x      & \x     & \x$^3$  & \x    &        &        \\
+match-case                        &      &        &        & \x    & \x      & \x     & \x      & \x    & \x     &        \\
+if-else                           &      &        &        &       &         &        &         &       &        & \x     \\
+Built-in Thrower Functions        &      & \x     &        &       &         &        &         & \x    & \x$^4$ &        \\
+Happy Path Programming            &      &        &        & \x    &         &        & \x      & \x    & \x     &        \\
+Uncaught Exception Handler        & \x   & \x     & \x     & \x    & \x      & \x     & \x      & \x    & \x$^5$ & \x$^5$ \\
+Children Survive After Main Dies  & \x   &        & \x     & \x    & \x$^1$  & \x$^1$ &         &       &        &        \\
+Children Raise to Parent          &      & \x     &        & \x    & \x$^2$  & \x$^2$ &         &       &        &        \\
+Raise to Another Thread / Process &      &        &        &       & \x      & \x     & \x      &       &        &        \\
 \end{tblr}
 \caption{Summary of Exception Handling Properties of some Programming Languages}
 \end{table}

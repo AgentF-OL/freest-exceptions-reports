@@ -188,6 +188,7 @@
  @String{OxfordPress = "Oxford University Press" }  %address Oxford or London?
  @String{PergamonPress = "Pergamon Press" }
  @String{PlenumPress = "Plenum Press" }
+ @String{Pragmatic = "The Pragmatic Bookshelf" }
  @String{PrenticeHall = "Prentice-Hall" }
  @String{SIAMPub = "{SIAM} Publications" }
  @String{Springer = "Springer-Verlag" }
@@ -198,20 +199,9 @@
 @misc{freest,
   author       = {FreeST Team},
   title        = {FreeST},
-  year         = {2023},
+  year         = {2026},
   howpublished = {\url{https://freest-lang.github.io/}},
   note         = {Accessed: 2026-10-28},
-}
-
-@inbook{javabook,
-  author = {Barbara Liskov and John Guttag},
-  title = {Program Development in Java: Abstraction, Specification, and Object-Oriented Design},
-  chapter = {Exceptions},
-  pages = {57--76},
-  publisher = AddisonWesley,
-  address = {Boston, Massachusetts, USA},
-  year = {2000},
-  isbn = {978-0-201-65768-5},
 }
 
 @article{exceptionssessiontypes,
@@ -233,10 +223,34 @@
   keywords = {web programming, session types, exceptions, asynchrony}
 }
 
-@book{exceptionhandling,
+@incollection{eh,
   author = {Pedro Mejia Alvarez, Raul E. Gonzalez Torres, Susana Ortega Cisneros},
-  title = {Exception Handling: Fundamentals and Programming},
-  publisher = {Springer Nature Switzerland AG},
+  booktitle = {Exception Handling: Fundamentals and Programming},
+  title = {Introduction to Exception Handling},
+  pages = {1--16},
+  publisher = {Springer},
+  address = {Gewerbestrasse 11, 6330 Cham, Switzerland},
+  year = {2024},
+  isbn = {978-3-031-50681-9},
+}
+
+@incollection{ehuncaught,
+  author = {Pedro Mejia Alvarez, Raul E. Gonzalez Torres, Susana Ortega Cisneros},
+  booktitle = {Exception Handling: Fundamentals and Programming},
+  title = {Advanced Exception Handling Techniques},
+  pages = {65},
+  publisher = {Springer},
+  address = {Gewerbestrasse 11, 6330 Cham, Switzerland},
+  year = {2024},
+  isbn = {978-3-031-50681-9},
+}
+
+@incollection{ehthreads,
+  author = {Pedro Mejia Alvarez, Raul E. Gonzalez Torres, Susana Ortega Cisneros},
+  booktitle = {Exception Handling: Fundamentals and Programming},
+  title = {Advanced Exception Handling Techniques},
+  pages = {60--64},
+  publisher = {Springer},
   address = {Gewerbestrasse 11, 6330 Cham, Switzerland},
   year = {2024},
   isbn = {978-3-031-50681-9},
@@ -256,5 +270,370 @@
   keywords = {programming languages, exception handling mechanisms},
   location = {Berlin, Germany},
   series = {ECOOP'07}
+}
+
+@incollection{javabook,
+  author = {Barbara Liskov and John Guttag},
+  booktitle = {Program Development in Java: Abstraction, Specification, and Object-Oriented Design},
+  title = {Exceptions},
+  pages = {57--76},
+  publisher = AddisonWesley,
+  address = {Boston, Massachusetts, USA},
+  year = {2000},
+  isbn = {978-0-201-65768-5},
+}
+
+@misc{javaexceptions,
+  author       = {Kevin Spector},
+  title        = {Java Exceptions: Errors, Stack Traces, and Throwing},
+  year         = {2026},
+  howpublished = {\url{https://coddy.tech/docs/java/exceptions}},
+  note         = {Accessed: 2026-10-31},
+}
+
+@misc{javaeh,
+  author       = {Kevin Spector},
+  title        = {Java try-catch: Handle Exceptions Without Crashing},
+  year         = {2026},
+  howpublished = {\url{https://coddy.tech/docs/java/try-catch}},
+  note         = {Accessed: 2026-10-31},
+}
+
+@misc{javaueh,
+  author       = {Oracle},
+  title        = {Interface Thread.UncaughtExceptionHandler},
+  year         = {2026},
+  howpublished = {\url{https://docs.oracle.com/javase/8/docs/api/java/lang/Thread.UncaughtExceptionHandler.html}},
+  note         = {Accessed: 2026-11-02},
+}
+
+@incollection{kotlinbook,
+  author = {Venkat Subramaniam},
+  editor = {Jacquelyn Carter},
+  booktitle = {Programming Kotlin: Creating Elegant, Expressive, and Performant JVM and Android Applications},
+  title = {Asynchronous Programming},
+  pages = {309--326},
+  publisher = Pragmatic,
+  address = {Raleigh, North Carolina, USA},
+  year = {2019},
+  isbn = {978-1-68050-635-8},
+}
+
+@misc{kotlineh,
+  author       = {JetBrains and The Kotlin Community},
+  title        = {Exception and error handling},
+  year         = {2026},
+  howpublished = {\url{https://kotlinlang.org/docs/exceptions.html}},
+  note         = {Accessed: 2026-10-31},
+}
+
+@misc{kotlincoroutineseh,
+  author       = {JetBrains and The Kotlin Community},
+  title        = {Coroutine exceptions handling},
+  year         = {2026},
+  howpublished = {\url{https://kotlinlang.org/docs/exception-handling.html}},
+  note         = {Accessed: 2026-11-02},
+}
+
+@incollection{pythonbook,
+  author = {Eric Matthes},
+  booktitle = {Python Crash Course: A Hands-On, Project-Based Introduction to Programming},
+  title = {Files and Exceptions},
+  pages = {192--200},
+  publisher = {No Starch Press},
+  address = {San Francisco, California, USA},
+  year = {2023},
+  isbn = {978-1-7185-0271-0},
+}
+
+@misc{pythoneh,
+  author       = {Muhammed Ali},
+  title        = {The ultimate guide to Python exception handling},
+  year         = {2025},
+  howpublished = {\url{https://www.honeybadger.io/blog/a-guide-to-exception-handling-in-python/}},
+  note         = {Accessed: 2026-10-31},
+}
+
+incollection{scalabook,
+  author = {Venkat Subramaniam},
+  editor = {Daniel H. Steinberg},
+  booktitle = {Programming Scala: Tackle Multi-Core Complexity on the Java Virtual Machine},
+  title = {Exception Handling},
+  pages = {183--186},
+  publisher = Pragmatic,
+  address = {Raleigh, North Carolina, USA},
+  year = {2009},
+  isbn = {978-1-934356-31-9},
+}
+
+@incollection{scalabook,
+  author = {John Hunt},
+  booktitle = {A Beginner's Guide to Scala, Object Orientation and Functional Programming},
+  title = {Exception Handling},
+  pages = {313--326},
+  publisher = {Springer},
+  address = {Gewerbestrasse 11, 6330 Cham, Switzerland},
+  year = {2018},
+  isbn = {978-3-319-75771-1},
+}
+
+@incollection{scalabookfutures,
+  author = {John Hunt},
+  booktitle = {A Beginner's Guide to Scala, Object Orientation and Functional Programming},
+  title = {Further Akka Actors},
+  pages = {348--350},
+  publisher = {Springer},
+  address = {Gewerbestrasse 11, 6330 Cham, Switzerland},
+  year = {2018},
+  isbn = {978-3-319-75771-1},
+}
+
+@misc{scalaeh,
+  author       = {Baeldung},
+  title        = {Exception Handling in Scala},
+  year         = {2025},
+  howpublished = {\url{https://www.baeldung.com/scala/exception-handling}},
+  note         = {Accessed: 2026-10-31},
+}
+
+@misc{scalaeither,
+  author       = {Baeldung},
+  title        = {The Either Type in Scala},
+  year         = {2024},
+  howpublished = {\url{https://www.baeldung.com/scala/either-type}},
+  note         = {Accessed: 2026-10-31},
+}
+
+@misc{scalafunctionaleh,
+  author       = {Scala},
+  title        = {Functional Error Handling},
+  year         = {2022},
+  howpublished = {\url{https://docs.scala-lang.org/scala3/book/fp-functional-error-handling.html}},
+  note         = {Accessed: 2026-10-31},
+}
+
+@incollection{erlangbookeh,
+  author = {Joe Armstrong},
+  booktitle = {Programming Erlang: Software for a Concurrent World},
+  title = {Exceptions},
+  pages = {76--85},
+  publisher = Pragmatic,
+  address = {Raleigh, North Carolina, USA},
+  year = {2007},
+  isbn = {978-1-934356-00-5},
+}
+
+@incollection{erlangbookprocesses,
+  author = {Joe Armstrong},
+  booktitle = {Programming Erlang: Software for a Concurrent World},
+  title = {Errors in Concurrent Programs},
+  pages = {159--174},
+  publisher = Pragmatic,
+  address = {Raleigh, North Carolina, USA},
+  year = {2007},
+  isbn = {978-1-934356-00-5},
+}
+
+@misc{erlangeh,
+  author       = {Erlang},
+  title        = {Errors and Error Handling},
+  year         = {2026},
+  howpublished = {\url{https://www.erlang.org/doc/system/errors.html}},
+  note         = {Accessed: 2026-10-31},
+}
+
+@misc{erlangprocesses,
+  author       = {Erlang},
+  title        = {Processes},
+  year         = {2026},
+  howpublished = {\url{https://www.erlang.org/doc/system/ref_man_processes.html}},
+  note         = {Accessed: 2026-10-31},
+}
+
+@incollection{elixirbookeh,
+  author = {Dave Thomas},
+  booktitle = {Programming Elixir {$\ge$} 1.6: Functional |> Concurrent |> Pragmatic |> Fun},
+  title = {Exceptions: raise and try, catch and throw},
+  pages = {355--359},
+  publisher = Pragmatic,
+  address = {Raleigh, North Carolina, USA},
+  year = {2018},
+  isbn = {978-1-68050-299-2},
+}
+
+@incollection{elixirbooktupleeh,
+  author = {Dave Thomas},
+  booktitle = {Programming Elixir {$\ge$} 1.6: Functional |> Concurrent |> Pragmatic |> Fun},
+  title = {Control Flow},
+  pages = {137--139},
+  publisher = Pragmatic,
+  address = {Raleigh, North Carolina, USA},
+  year = {2018},
+  isbn = {978-1-68050-299-2},
+}
+
+@incollection{elixirbookprocesses,
+  author = {Dave Thomas},
+  booktitle = {Programming Elixir {$\ge$} 1.6: Functional |> Concurrent |> Pragmatic |> Fun},
+  title = {OTP: Supervisors},
+  pages = {247--256},
+  publisher = Pragmatic,
+  address = {Raleigh, North Carolina, USA},
+  year = {2018},
+  isbn = {978-1-68050-299-2},
+}
+
+@misc{elixireh,
+  author       = {Elixir School},
+  title        = {Error Handling},
+  year         = {2022},
+  howpublished = {\url{https://elixirschool.com/en/lessons/intermediate/error_handling}},
+  note         = {Accessed: 2026-10-31},
+}
+
+@misc{elixirprocesses,
+  author       = {Elixir School},
+  title        = {Concurrency},
+  year         = {2026},
+  howpublished = {\url{https://elixirschool.com/en/lessons/intermediate/concurrency}},
+  note         = {Accessed: 2026-10-31},
+}
+
+@misc{elixirexit,
+  author       = {Elixir},
+  title        = {Process},
+  year         = {2026},
+  howpublished = {\url{https://elixir.hexdocs.pm/1.20.5/Process.html}},
+  note         = {Accessed: 2026-11-02},
+}
+
+@incollection{haskellbookeh,
+  author = {Anton Antich},
+  booktitle = {Magical Haskell: A Friendly Approach to Modern Functional Programming, Type Theory, and Artificial Intelligence},
+  title = {AI Multi-agents, Arrows, and the Future},
+  pages = {396--399},
+  publisher = {Apress},
+  address = {Schaffhausen, Switzerland},
+  year = {2025},
+  isbn = {979-8-8688-1282-8},
+}
+
+@incollection{haskellbookfunctionaleh,
+  author = {Anton Antich},
+  booktitle = {Magical Haskell: A Friendly Approach to Modern Functional Programming, Type Theory, and Artificial Intelligence},
+  title = {Functor, Bifunctor, and Applicative Functor Enter an Elevator},
+  pages = {92--97},
+  publisher = {Apress},
+  address = {Schaffhausen, Switzerland},
+  year = {2025},
+  isbn = {979-8-8688-1282-8},
+}
+
+@incollection{haskellbookhappyeh,
+  author = {Anton Antich},
+  booktitle = {Magical Haskell: A Friendly Approach to Modern Functional Programming, Type Theory, and Artificial Intelligence},
+  title = {Input, Transformer Stack, Output},
+  pages = {147--157},
+  publisher = {Apress},
+  address = {Schaffhausen, Switzerland},
+  year = {2025},
+  isbn = {979-8-8688-1282-8},
+}
+
+@misc{haskelleh,
+  author       = {The University of Glasgow and Core Libraries Committee},
+  title        = {Control.Exception},
+  year         = {2025},
+  howpublished = {\url{https://hackage-content.haskell.org/package/base-4.22.0.0/docs/Control-Exception.html}},
+  note         = {Accessed: 2026-10-31},
+}
+
+@misc{haskellfunctionaleh,
+  author       = {Gil Mizrahi},
+  title        = {Handling errors with Either},
+  year         = {2025},
+  howpublished = {\url{https://learn-haskell.blog/06-errors_and_files/01-either.html}},
+  note         = {Accessed: 2026-11-01},
+}
+
+@misc{haskellueh,
+  author       = {Ivan Gromakovsky},
+  title        = {Handling of Uncaught Exceptions in Haskell},
+  year         = {2020},
+  howpublished = {\url{https://serokell.io/blog/uncaught-exception-handling}},
+  note         = {Accessed: 2026-11-02},
+}
+
+@incollection{ocamlbook,
+  author = {Yaron Minsky, Anil Madhavapeddy and Jason Hickey},
+  booktitle = {Real World OCaml: Functional Programming for the Masses},
+  title = {Error Handling},
+  pages = {123--138},
+  publisher = {O'Reilly Media},
+  address = {Sebastopol, California, USA},
+  year = {2013},
+  isbn = {978-1-449-32391-2},
+}
+
+@misc{ocamleh,
+  author       = {OCaml},
+  title        = {Error Handling},
+  year         = {2026},
+  howpublished = {\url{https://ocaml.org/docs/error-handling}},
+  note         = {Accessed: 2026-11-01},
+}
+
+@misc{ocamlueh,
+  author       = {OCaml},
+  title        = {Module Thread},
+  year         = {2026},
+  howpublished = {\url{https://ocaml.org/manual/5.5/api/Thread.html}},
+  note         = {Accessed: 2026-11-02},
+}
+
+@incollection{rustbook,
+  author = {Steve Klabnik, Carol Nichols, Chris Krycho and the Rust Community},
+  booktitle = {The Rust Programming Language, 3rd Edition},
+  title = {Error Handling},
+  pages = {167--186},
+  publisher = {No Starch Press},
+  address = {San Francisco, California, USA},
+  year = {2026},
+  isbn = {978-1-7185-0445-5},
+}
+
+@incollection{gobook,
+  author = {Nathan Youngman and Roger Peppé},
+  booktitle = {Get Programming with Go},
+  title = {To err is human},
+  pages = {230--247},
+  publisher = {Manning},
+  address = {Shelter Island, New York, USA},
+  year = {2018},
+  isbn = {9781617293092},
+}
+
+@misc{goeh,
+  author       = {Wojciech Gancarczyk},
+  title        = {A practical guide to error handling in Go},
+  year         = {2025},
+  howpublished = {\url{https://www.datadoghq.com/blog/go-error-handling/}},
+  note         = {Accessed: 2026-11-02},
+}
+
+@misc{gochannelseh,
+  author       = {Naren Chitrakar},
+  title        = {Handling errors in channels},
+  year         = {2021},
+  howpublished = {\url{https://medium.com/@developer.naren/handling-errors-in-channels-e76ad5cbf3a0}},
+  note         = {Accessed: 2026-11-02},
+}
+
+@misc{goerrgroupeh,
+  author       = {Go},
+  title        = {Package errgroup Documentation},
+  year         = {2026},
+  howpublished = {\url{https://pkg.go.dev/golang.org/x/sync/errgroup}},
+  note         = {Accessed: 2026-11-02},
 }
 

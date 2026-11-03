@@ -48,6 +48,7 @@
   }
 
 \newcommand{\zap}{\text{\faBoltLightning}}
+\newcommand{\x}{\ding{55}}
 
 \newcommand{\un}{\text{un}}
 \newcommand{\lin}{\text{lin}}
@@ -123,6 +124,32 @@
 
 \newcommand{\rrule}[1]{\textsc{\text{#1}}}
 
+\newcommand{\syntax}[1]{\textbf{#1}}
+\newcommand{\tryb}{\syntax{try}}
+\newcommand{\catchb}{\syntax{catch}}
+\newcommand{\finallyb}{\syntax{finally}}
+\newcommand{\elseb}{\syntax{else}}
+\newcommand{\afterb}{\syntax{after}}
+\newcommand{\throwb}{\syntax{throw}}
+\newcommand{\raiseb}{\syntax{raise}}
+\newcommand{\exitb}{\syntax{exit}}
+\newcommand{\matchb}{\syntax{match}}
+\newcommand{\caseb}{\syntax{case}}
+\newcommand{\ifb}{\syntax{if}}
+\newcommand{\elsebb}{\syntax{else}}
+\newcommand{\joinb}{\syntax{join}}
+\newcommand{\awaitb}{\syntax{await}}
+\newcommand{\inb}{\syntax{in}}
+\newcommand{\otherwiseb}{\syntax{otherwise}}
+\newcommand{\unlessb}{\syntax{unless}}
+\newcommand{\cancelb}{\syntax{cancel}}
+\newcommand{\forb}{\syntax{for}}
+\newcommand{\yieldb}{\syntax{yield}}
+\newcommand{\dob}{\syntax{do}}
+
+\newcommand{\etal}{\textit{et al.}}
+\newcommand{\simon}{Simon Fowler \etal}
+
 %% end of the preamble, start of the body of the document source.
 \begin{document}
 
@@ -172,13 +199,20 @@
   \noindent\textbf{Outline.} How is the rest of the document structured? \\The remainder of this document is organised as follows. Section \ref{sec:background} presents bla bla bla. ...
 \end{template}
 
-Exception mechanisms have been integrated in many programming languages to deal with unexpected events at runtime~\cite{exceptionhandling}. Unlike errors, exceptions allow a method to bring some information to the attention of the caller, propagating up the call stack until a method is found that can handle the exception~\cite{javabook}. Session types provide compile-time guarantees that communication between threads follows an established protocol~\cite{exceptionssessiontypes}. FreeST is a concurrent programming language based on session types that is yet to properly handle failures~\cite{freest}.
+Exception mechanisms have been integrated in many programming languages to deal with unexpected events at runtime~\cite{eh}.
+Unlike errors, exceptions allow a method to bring some information to the attention of the caller, propagating up the call stack until a method is found that can handle the exception~\cite{javabook}.
+Session types provide compile-time guarantees that communication between threads follows an established protocol~\cite{exceptionssessiontypes}.
+FreeST is a concurrent programming language based on session types that is yet to properly handle failures~\cite{freest}.
 
-Previous efforts have been made to handle failures in programming languages with session types~\cite{exceptionssessiontypes}. This paper extends those efforts to cover all the constructs and features of the FreeST programming language.
+Previous efforts have been made to handle failures in programming languages with session types~\cite{exceptionssessiontypes}.
+This paper extends those efforts to cover all the constructs and features of the FreeST programming language.
 
-The main goal of this project is to enhance the FreeST compiler with exceptions and exception handling mechanisms, so that FreeST programs can be robust and reliable, even in the face of failures during the communication protocols. This will also provide valuable progress to future implementations of distributed applications in FreeST, which are very prone to failures~\cite{exceptionssessiontypes} (e.g. network connection problems and crashes). Additionaly, the new mechanisms must be practical from the point of view of the programmer: well integrated with the language without getting in the way, intuitive based on other programming languages, and simple without too much boilerplate code.
+The main goal of this project is to enhance the FreeST compiler with exceptions and exception handling mechanisms, so that FreeST programs can be robust and reliable, even in the face of failures during the communication protocols.
+This will also provide valuable progress to future implementations of distributed applications in FreeST, which are very prone to failures~\cite{eh,exceptionssessiontypes} (e.g. network connection problems and crashes).
+Additionaly, the new mechanisms must be practical from the point of view of the programmer: well integrated with the language without getting in the way, intuitive based on other programming languages, and simple without too much boilerplate code.
 
-The remainder of this paper is organized as follows. Section 2 presents..............
+The remainder of this paper is organized as follows.
+Section 2 presents..............
 
 \section{Background} \label{sec:background}
 
@@ -188,9 +222,12 @@ The remainder of this paper is organized as follows. Section 2 presents.........
 
 To better understand the context of this project, it is important to highlight some definitions that will be used throughout this paper, namely exceptions, exception handling and the FreeST programming language.
 
-Exceptions~\cite{exceptionhandling} are unexpected runtime events that lead to undesirable behaviour, which can result from code or logic errors, invalid user input, hardware or resource problems such as running out of memory, and external factors, for instance, network connection problems. Exceptions encapsulate information about the cause of the event and other information that can be useful for debugging the program (e.g. the location of the event in the code).
+Exceptions~\cite{eh} are unexpected runtime events that lead to undesirable behaviour, which can result from code or logic errors, invalid user input, hardware or resource problems such as running out of memory, and external factors, for instance, network connection problems.
+Exceptions encapsulate information about the cause of the event and other information that can be useful for debugging the program (e.g. the location of the event in the code).
 
-Exception handling~\cite{exceptionhandling} allows the issue to be fixed at runtime so that the program can resume execution, or terminate gracefully without causing harm. Common ways to handle exceptions~\cite{ehfieldstudy} include logging the error message, rethrowing the exception to the caller, continuing a loop, stopping the execution of the method and returning to the caller, rollbacking the effects of the code that led to the exception, changing an object state to a static default, a combination of these, and simply ignoring the error. After executing code that can lead to an exception, it is often helpful to have code dedicated to closing resources or making asserts that the properties of the program still hold, regardless if the code caused an exception or not.
+Exception handling~\cite{eh} allows the issue to be fixed at runtime so that the program can resume execution, or terminate gracefully without causing harm.
+Common ways to handle exceptions~\cite{ehfieldstudy} include logging the error message, rethrowing the exception to the caller, continuing a loop, stopping the execution of the method and returning to the caller, rollbacking the effects of the code that led to the exception, changing an object state to a static default, a combination of these, and simply ignoring the error.
+After executing code that can lead to an exception, it is often helpful to have code dedicated to closing resources or making asserts that the properties of the program still hold, regardless if the code caused an exception or not.
 
 FreeST~\cite{freest} is a functional programming language for safe concurrency powered by context-free session types.
 In FreeST, processes communicate by passing messages through bidirectional channels, which maintain a buffer of messages.
@@ -214,6 +251,7 @@ Shared channel types start with a `$*$' symbol (e.g. $*$!Int and $*\viewreceive\
 Shared channel BIFs end with a `\_' symbol ($\send\_$, $\receive\_$ and $\select\_$) and the $\case$ expression is also available for unrestricted choices on the receiver side.
 FreeST types have types themselves, called kinds.
 Kinds are composed of a base kind ($\Tkind$ for any type, $\Skind$ for session types, and $\Ckind$ for channel types, which are closed at the end) and multiplicity ($\lin$ for linear and $\un$ for unrestricted).
+FreeST threads are independent: there is not a main thread.
 
 \section{Related Work} \label{sec:relatedwork}
 
@@ -226,6 +264,116 @@ Kinds are composed of a base kind ($\Tkind$ for any type, $\Skind$ for session t
   
   In this work, you are expected to follow the guidelines on document preparation presented in Lamport’s book on \LaTeX~\cite{lamport1994latex}. For editing, you may use tools such as the online platform Overleaf~\cite{overleaf}. There is also a good chance that your project will build upon some of Lamport’s many scientific contributions, such as the concept of logical clocks~\cite{lamport1978clocks}.
 \end{template}
+
+Handling failures is a concept that many programming languages have already implemented, each with their own characteristics.
+Before delving right into the exception handling implementation for FreeST, it is important to reflect about its state of art: how the other languages handle failures, what they have in common, what they do differently and their reasoning for it.
+Table \ref{table:ehlanguages} provides a summary of various characteristics of failure handling in programming languages that will be discussed in the following subsections.
+
+\begin{table*}[]
+\footnotesize
+\centering
+\begin{tblr}{
+  colspec={X[l] *{10}{X[c]}},
+  rowspec={X[m] *{12}{X[m]}},
+  column{1}={wd=2.7cm}, column{2-Z}={wd=0.93cm},
+  row{1}={guard}, row{2-Z}={ht=1cm, abovesep=0pt, belowsep=0pt},
+  hline{2}={1-Z}{},
+  vline{2}={1-Z}{}
+}
+                                  & Java & Kotlin & Python & Scala & Erlang  & Elixir & Haskell & OCaml & Rust   & Go  \\
+Exceptions                        & \x   & \x     & \x     & \x    & \x      & \x     & \x      & \x    &        &     \\
+Either / Result / Tuple           &      &        &        & \x    & \x      & \x     & \x      & \x    & \x     &     \\
+Error Values                      &      &        &        &       &         &        &         &       &        & \x  \\
+try-catch-finally                 & \x   & \x     & \x     & \x    & \x      & \x     & \x      & \x    &        &     \\
+match-case                        &      &        &        & \x    & \x      & \x     & \x      & \x    & \x     &     \\
+if-else                           &      &        &        &       &         &        &         &       &        & \x  \\
+Happy Path Programming            &      &        &        & \x    &         &        & \x      & \x    & \x     &     \\
+Uncaught Exception Handler        & \x   & \x     & \x     & \x    & \x      & \x     & \x      & \x    & \x     & \x  \\
+Children Survive After Main Dies  & \x   &        & \x     & \x    & \x      & \x     &         &       &        &     \\
+Children Raise to Parent          &      & \x     &        & \x    & \x      & \x     &         &       &        &     \\
+Raise to Another Thread / Process &      &        &        &       & \x      & \x     & \x      &       &        &     \\
+\end{tblr}
+\caption{Summary of Exception Handling Properties of some Programming Languages}
+\label{table:ehlanguages}
+\end{table*}
+
+\subsection{Exceptions and \tryb-\catchb-\finallyb}
+
+Not every programming language uses exceptions to handle failures, but the languages that can use them (e.g. Java~\cite{javabook,javaexceptions,javaeh}, Kotlin~\cite{kotlinbook,kotlineh}, Python~\cite{pythonbook,pythoneh}, Scala~\cite{scalabook,scalaeh}, Erlang~\cite{erlangbookeh,erlangeh}, Elixir~\cite{elixirbookeh,elixireh}, Haskell~\cite{haskellbookeh,haskelleh}, OCaml~\cite{ocamlbook,ocamleh}) handle them with \tryb-\catchb-\finallyb~blocks (or similarly named blocks), where the \tryb~block contains the code that can lead to an exception, \catchb~catches the provided exception(s) when they are raised in the \tryb~block and includes code to deal with them, and \finallyb~is for code that should execute after the previous blocks, regardless if an exception was raised or not.
+The same \tryb~block can have multiple \catchb~blocks, or the \catchb~block can have multiple patterns, each with the exceptions they handle, and multiple \tryb~blocks can be nested inside one another: if an inner \tryb~does not handle an exception, the outer \tryb~can handle it.
+Some languages (e.g. Python) provide an extra block - \elseb~- that executes if no exception was raised in the \tryb~block.
+Haskell does not provide these blocks as syntax of the language, but as functions of a module with similar behaviour, although only one of those functions needs to be used, not all three, and they receive the code blocks as arguments~\cite{haskelleh}.
+OCaml also does not have the \finallyb~block as a built-in primitive, but as a library function protect~\cite{ocamleh}.
+These exceptions can be raised implicitly by calling a function that raises them, or explicitly with \throwb~/ \raiseb~/ \exitb~that receive the exception to raise.
+It is clear from this that if FreeST is to have exceptions, then it will need \tryb-\catchb-\elseb-\finallyb~blocks or, at least, a subset of them, and syntax to explicitly raise an exception.
+
+\subsection{Error-Aware Types, \caseb~and Happy Paths}
+
+Exceptions are common in object-oriented languages.
+Functional languages often handle failures in a different way.
+Another approach to failure handling is using an Either / Result / Tuple type which stores either an error (can be an exception) if the computation failed, or the result of the computation (e.g. Scala~\cite{scalabook,scalaeither} with types Try or Either, Erlang~\cite{erlangbookeh} with tuples \{ok, Value\} and \{error, Reason\}, Elixir~\cite{elixirbooktupleeh,elixireh} with the same tuples, Haskell~\cite{haskellbookfunctionaleh,haskellfunctionaleh} with type Either, OCaml~\cite{ocamlbook,ocamleh} with type Result, Rust~\cite{rustbook} with type Result).
+To handle these types, \matchb~/ \caseb~expressions are used to inspect them with pattern matching, then each case can be handled separately.
+Thinking about handling failures on too many method calls is tedious and can clutter the code with nested \caseb~expressions.
+Some languages allow the programmer to focus on the happy path of a method and delay the failure handling (e.g. Scala~\cite{scalafunctionaleh} with \forb-\yieldb, Haskell~\cite{haskellbookhappyeh,haskellfunctionaleh} with $>>=$ binding or the \dob~notation, OCaml~\cite{ocamlbook,ocamleh} with function Result.bind or its variations, Rust~\cite{rustbook} with the ? operator).
+If any function calls inside the method fail, the method immediately ends in failure, while if no function call fails, each result will be provided to the next function, even if inside an error-aware type.
+With these operators, the failure is not handled, it is propagated to the caller, which can then handle it or keep propagating the failure.
+These functional languages allow handling failures using either exceptions (panic macro for Rust) or an error-aware type.
+In general, the former is used for completely unexpected situations that should just crash the program instead of causing more harm, while the last is used for failures that the caller is expected to want to handle and recover~\cite{elixirbooktupleeh,elixireh,ocamlbook,rustbook}.
+It is worth noting that, even though Erlang and Elixir allow the programmer to handle exceptions, the usual way to write code in these languages is to isolate the failure in a process and let it fail.
+Other processes monitoring the failing process can then receive its exit signal and handle the failure, possibly restarting the process~\cite{erlangbookprocesses,erlangprocesses,elixirbookprocesses,elixirprocesses}.
+FreeST already provides an Either type so this approach is possible, but it currently has no happy path operators so it could need a lot of boilerplate code.
+Regardless, it is yet to provide a type for exceptions or failures, which would make exceptions explicit in the code rather than reusing another type (e.g. string)~\cite{ocamleh}, and wrapping the result of every function that can fail inside an Either type can be tiresome.
+
+\subsection{Error Values and \ifb-\elsebb}
+
+Go provides yet another approach~\cite{gobook,goeh}.
+Any type in Go can be an error: it only needs to implement an interface.
+Errors can be wrapped inside other errors and can be concatenated with each other, building an error tree, so that the error handling can be delayed.
+Functions that can fail return a pair with the result (if there is one) and an error type (which is nil if the function did not fail).
+Failure handling is done simply with normal \ifb-\elsebb~syntax on the error, and functions can be used to traverse the error tree in search for an error (e.g. errors.Is, errors.As).
+This approach is simple and flexible, but it does not provide a good separation of concerns since the syntax for handling errors is the same one that can be used in the happy path of the program, functions that can fail always need to return a pair, there is no forced consistency on the error types used, and programmers are not forced to handle the errors.
+
+\subsection{Uncaught Exception Handler}
+
+A pattern present in all these languages is the existence of a default uncaught exception handler, responsible for any exception that escapes the execution of the program without being handled~\cite{ehuncaught}.
+The default behaviour is typically to stop the execution of the thread (or program) and log an error message with the cause.
+This behavior can be changed in many of these languages, for all threads or for a specific thread~\cite{javaueh,kotlincoroutineseh,haskellueh,ocamlueh}.
+Although Rust and Go do not provide exceptions, they still offer a panic macro / function, which can be called to automatically end execution with an error message, identical to an uncaught exception handler~\cite{rustbook,gobook}.
+Rust's compiler includes panic handlers to change the behaviour of panic (e.g. abort, halt)~\cite{rustbook}.
+Go allows panic to be handled by deferred functions with the recover function~\cite{gobook}.
+FreeST will need an uncaught exception handler as well to deal with exceptions not handled by the programmers, and it can provide a way to change its behaviour for one or all threads.
+
+\subsection{Interaction Between Threads on Failure}
+
+Since FreeST is a concurrent programming language, it is important to observe how threads in other languages interact when one fails.
+One important question is what happens to children threads when the main thread dies.
+Programming languages like Java, Python, Scala, Erlang and Elixir allow non-daemon threads / processes to keep executing, while others like Kotlin, Haskell, OCaml, Rust and Go terminate all threads after the main thread dies (much like FreeST).
+Another question is if children threads are allowed to raise an exception back to their parent, for them to handle it.
+Kotlin's child coroutines raise CancelledException when they fail due to an exception and the parent is able to handle it after waiting for the child to terminate (with \joinb~or \awaitb)~\cite{kotlinbook,kotlincoroutineseh}.
+Similarly, Scala's child threads can be wrapped inside a Future type, which parents can use to wait for them to terminate, handling any possible exceptions~\cite{scalabookfutures}.
+Erlang and Elixir allow for remote handling of errors: processes can be explicitly linked together so that the failure of a process can be handled by another or multiple processes terminate when a process they are linked to fails~\cite{erlangbookprocesses,erlangprocesses,elixirbookprocesses,elixirprocesses}.
+Go does not offer a built-in way for children to communicate failures to their parent, but a special channel can be used for this effect, where children send the error, that can then be received by the parent~\cite{gochannelseh}.
+This approach adds too much boilerplate code, so Go provides a package with a simpler technique where threads can belong to an error group and return an error from their function if needed, which will then be caught by the parent when it waits for its children~\cite{gochannelseh,goerrgroupeh}.
+This idea of error group is also present in other languages (e.g. Java~\cite{ehthreads}).
+One final question is if threads are allowed to raise exceptions in any other thread.
+Erlang, Elixir and Haskell allow this by using the ID of the process / thread when calling function exit/2 / throwTo~\cite{erlangbookprocesses,elixirexit,haskelleh}.
+Exceptions raised this way in Haskell are considered asynchronous exceptions.
+FreeST threads are independent, so there is no concept of main or child threads, so having children threads raise to their parent is out of question, but threads communicate with each other.
+To increase robustness and reliabilty, if one side of the communication fails, there should be some way of warning the other thread of the cause or at least warn that it failed, so that it can stop waiting forever and recover.
+Additionaly, when threads terminate due to failure, they should not disrupt the execution of other threads: they should fail silently if they do not handle an exception.
+
+\subsection{Previous Work on Exceptional Session Types}
+
+\simon~\cite{exceptionssessiontypes} has already come up with a solution for session types that can fail during communication, but it can only be applied to a subset of the FreeST language.
+The main problem is that the protocols for these session types are linear, meaning they have to be used exactly once, and the functions that work with these protocols return the continuation channel , which is also linear, meaning they have to be used until the end, so in a situation where a function of a thread fails during communication with another thread, there must be a way to cancel the protocol, warn the other thread that is waiting for something, and clear the buffer if needed, since there can be linear channels as well inside the buffer.
+\simon~proposes a \tryb-\inb-\otherwiseb~syntax, where \tryb~has the code that can fail, \inb~has code that is executed only if \tryb~was successful, similarly to Python's \elseb~block, and \otherwiseb~handles any exception that was raised during the \tryb~block.
+It also proposes an extension that replaces \otherwiseb~with \unlessb, which allows the programmer to catch specific exceptions.
+Exceptions are raised with \raiseb~and session type protocols are cancelled with \cancelb.
+Cancelled channel endpoints are zapped, a runtime syntax which indicates that its buffer needs to be cleared, meaning that every element inside (including other channel endpoints) need to be zapped as well.
+If the other side of the communication tries to receive something or close the channel, but its buffer is empty and the other endpoint was cancelled, then it will automatically zap its endpoint and raise an exception.
+An uncaught exception zaps the continuation of the function and, if it happened in the main thread, halts the program.
+Unlike FreeST, the rules here need both channels to be closed at the same time, so some work is also needed to adapt this.
+Zapped endpoints are garbage collected when both sides are zapped and the buffer is empty.
 
 \section{«Other Section(s) as Appropriate»} \label{sec:work1}
 
