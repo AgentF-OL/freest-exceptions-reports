@@ -211,7 +211,8 @@
 
 \textbf{Term Reduction} \hfill \fbox{$M \rightarrow_M N$}
 \begin{align*}
-  & \rrule{E-TryInVal} &~ \tryin{V}{x}{M}{N} &~ \rightarrow_M M\{V/x\}
+  & \rrule{E-TryInVal} &~ \tryin{V}{x}{M}{N} &~ \rightarrow_M M\{V/x\} \\
+  & \rrule{E-Lift}     &~ \run{E}{M}         &~ \rightarrow_M \run{E}{M'}, \quad \text{if}~M \rightarrow_M M'
 \end{align*}
 \textbf{Configuration Equivalence} \hfill \fbox{$\C~\eq~\D$}
 
@@ -250,7 +251,7 @@ $(va)(vb)(\buf{a}{\empt}{\m}{b}{\empt})~||~\C~\eq~\C$
   & \rrule{E-Cancel}         &~ \run{E}{\cancel~a}~||~\buf{a}{\vv}{\m}{b}{\ww}                                 &~ \rightarrow \run{E}{()}~||~\buf{a}{\zap\vv}{\m}{b}{\ww}                                                                                 \\
   & \rrule{E-TryInRaise}     &~ \run{E}{\tryin{\run{P}{\rraise}}{x}{M}{N}}                                     &~ \rightarrow \run{E}{\zap P~;~N}                                                                                                         \\
   & \rrule{E-Raise}          &~ \run{P}{\rraise}                                                               &~ \rightarrow \zap P                                                                                                                      \\
-  & \rrule{E-Lift}           &~ \run{\G}{\C}                                                                   &~ \rightarrow \run{\G}{\D}, \quad \text{if}~\C \rightarrow \D
+  & \rrule{E-LiftC}          &~ \run{\G}{\C}                                                                   &~ \rightarrow \run{\G}{\D}, \quad \text{if}~\C \rightarrow \D
 \end{align*}
 
 \textbf{Zap Reduction} \hfill \fbox{$C \zaparrow D$}
