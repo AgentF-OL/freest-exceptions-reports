@@ -68,7 +68,7 @@
 \newcommand{\sendType}{\mbf{sendType}}
 \newcommand{\receiveType}{\mbf{receiveType}}
 \newcommand{\select}{\mbf{select}}
-\newcommand{\caseLabel}[6]{\mbf{case}~#5~\mbf{of}~\{#3\&#4_#1~#5_#1 \rightarrow #6_#1\}^{#1 \in 1..#2}}
+\newcommand{\caseLabel}[5]{\mbf{case}~#4~\mbf{of}~\{\&#3_#1~#4_#1 \rightarrow #5_#1\}^{#1 \in 1..#2}}
 \newcommand{\cancel}{\mbf{cancel}}
 \newcommand{\rraise}{\mbf{raise}}
 \newcommand{\try}[2]{\mbf{try}~#1~\mbf{otherwise}~#2}
@@ -169,23 +169,24 @@
   & \text{Multiplicity}           &~ \m       & ::= \un~|~\lin                                                        \\
   & \text{Basic Kinds}            &~ \bkind   & ::= \Ckind~|~\Skind~|~\Tkind                                          \\
   & \text{Kinds}                  &~ \kind    & ::= \bkind^\m                                                         \\
-  & \text{Polarity}               &~ \pol     & ::= \m !~|~\m ?                                                       \\
+  & \text{Polarity}               &~ \pol     & ::= \m!~|~\m?                                                         \\
   & \text{View}                   &~ \view    & ::= \m\!\viewsend~|~\m\viewreceive                                    \\
   & \text{Channel End}            &~ \End     & ::= \Close~|~\Wait                                                    \\
-  & \text{Types}                  &~ \T, U    & ::= \Skip~|~\pol\T~|~\view\record~|~\End~|~\T;\T                      \\
-                                &&& \phantom{~::=~} ()_\m~|~\pair{\T}{\T}~|~\T \rightarrow_\m \T~|~\record~|\variant  \\
+  & \text{Types}                  &~ \T       & ::= \Skip~|~\pol\T~|~\view\record~|~\End~|~\T~;~\T~|~()               \\
+                                &&& \phantom{~::=~} \pair{\T}{\T}~|~\T \rightarrow_\m \T~|~\record~|\variant          \\
                                 &&& \phantom{~::=~} \foralll{a}{\kind}{\T}~|~\recursion{a}{\kind}{\T}~|~a             \\
   & \text{Kinding contexts}       &~ \kindctx & ::= \empt~|~\bind{\kindctx}{a}{\kind}                                 \\
-  & \text{Variables}              &~ x,y                                                                              \\
-  & \text{Terms}                  &~ L,M,N    & ::= x~|~\abs{\m}{x}{\T}{M}~|~M~N~|~()_m~|~(M,N)                       \\
-                                &&& \phantom{~::=~} \lett{()_\m}{M}{N}~|~\lett{(x,y)}{M}{N}                           \\
-                                &&& \phantom{~::=~} \channel~@\T~|~\fork~M~|~\send_\m~M~N~|~\receive_\m~M             \\
+  & \text{Variables}              &~ x,y,a,b                                                                          \\
+  & \text{Values}                 &~ V,W      & ::= x~|~\abs{\m}{x}{\T}{M}~|~()~|~(V,W)~|~\lbl~|~\zap                 \\
+  & \text{Terms}                  &~ L,M,N    & ::= V~|~M~N~|~()_m~|~(M,N)                                            \\
+                                &&& \phantom{~::=~} \lett{()}{M}{N}~|~\lett{(x,y)}{M}{N}                              \\
+                                &&& \phantom{~::=~} \channel~@\T~|~\fork~M~|~\send~M~N~|~\receive~M                   \\
                                 &&& \phantom{~::=~} \sendType~@\T~M~|~\receiveType~M                                  \\
-                                &&& \phantom{~::=~} \select_\m~\lbl~|~\caseLabel{i}{n}{\m}{\ell}{M}{N}                \\
+                                &&& \phantom{~::=~} \select~\lbl~|~\caseLabel{i}{n}{\ell}{M}{N}                       \\
                                 &&& \phantom{~::=~} \close~M~|~\wait~M~|~\cancel~M~|~\rraise                          \\
                                 &&& \phantom{~::=~} \tryin{L}{x}{M}{N}                                                \\
   & \text{Typing contexts}        &~ \typectx & ::= \empt~|~\bind{\kindctx}{x}{\T}                                    \\
-  & \text{Configurations}         &~ \C,\D,\E & ::= (va)\C~|~\C~||~\D~|~\zap a~|~\buf{a}{\vv}{\m}{b}{\ww}             \\
+  & \text{Configurations}         &~ \C,\D,\E & ::= (va)\C~|~\C~||~\D~|~\buf{a}{\vv}{\m}{b}{\ww}                      \\
   & \text{Evaluation contexts}    &~ E        & ::= ...                                                               \\
   & \text{Pure contexts}          &~ P        & ::= ...                                                               \\
   & \text{Configuration contexts} &~ \G       & ::= [~]~|~(va)\G~|~\G~||~\C
@@ -238,37 +239,34 @@ $(va)(vb)(\buf{a}{\empt}{\m}{b}{\empt})~||~\C~\eq~\C$
 
 \textbf{Configuration Reduction} \hfill \fbox{$\C \rightarrow \D$}
 \begin{align*}
-  & \rrule{E-Channel} \quad\quad\quad \lefteqn{\run{E}{\channel~@U}                                               \rightarrow (va)(vb)(\run{E}{(a,b)}~||~\buf{a}{\empt}{\text{mult}(\text{kind}(U))}{b}{\empt}), \quad \text{where}~a,b~\text{are fresh}} \\
-  & \rrule{E-Fork}           &~ \run{E}{\fork~(\lambda x.M)}                                                   &~ \rightarrow \run{E}{()}~||~M\{()/x\}                                                                                                    \\
-  & \rrule{E-Send}           &~ \run{E}{\send_{\m}~U~a}~||~\buf{a}{\vv}{\m}{b}{\ww}                            &~ \rightarrow \run{E}{a}~||~\buf{a}{\vv}{\m}{b}{\ww \cdot U}                                                                              \\
-  & \rrule{E-Receive}        &~ \run{E}{\receive_{\m}~a}~||~\buf{a}{U \cdot \vv}{\m}{b}{\ww}                   &~ \rightarrow \run{E}{(U,a)}~||~\buf{a}{\vv}{\m}{b}{\ww}                                                                                  \\
-  & \rrule{E-SendType}       &~ \run{E}{\sendType~@U~a}~||~\buf{a}{\vv}{\lin}{b}{\ww}                          &~ \rightarrow \run{E}{a}~||~\buf{a}{\vv}{\lin}{b}{\ww \cdot @U}                                                                           \\
-  & \rrule{E-ReceiveType}    &~ \run{E}{\receiveType~a}~||~\buf{a}{@U \cdot \vv}{\lin}{b}{\ww}                 &~ \rightarrow \run{E}{(@U,a)}~||~\buf{a}{\vv}{\lin}{b}{\ww}                                                                               \\
-  & \rrule{E-Close}          &~ \run{E}{\close~a}~||~\buf{a}{\empt}{\lin}{b}{\ww}                              &~ \rightarrow \run{E}{()}~||~\buf{a}{\empt}{\lin}{b}{\ww \cdot \eos}                                                                      \\
-  & \rrule{E-Wait}           &~ (va)(vb)(\run{E}{\wait~a}~||~\buf{a}{\eos}{\lin}{b}{\empt})                    &~ \rightarrow \run{E}{()}                                                                                                                 \\
-  & \rrule{E-Select}         &~ \run{E}{\select_{\m}~\lbl~a}~||~\buf{a}{\vv}{\m}{b}{\ww}                       &~ \rightarrow \run{E}{a}~||~\buf{a}{\vv}{\m}{b}{\ww \cdot \lbl}                                                                           \\
-  & \rrule{E-Case} ~~ \lefteqn{\run{E}{\caseLabel{i}{n}{\m}{\lbl}{a}{M}}~||~\buf{a}{\lbl_j \cdot \vv}{\m}{b}{\ww} \rightarrow \run{E}{M_j}~||~\buf{a_j}{\vv}{\m}{b}{\ww}}                                                                                 \\
-  & \rrule{E-Cancel}         &~ \run{E}{\cancel~a}~||~\buf{a}{\vv}{\m}{b}{\ww}                                 &~ \rightarrow \run{E}{()}~||~\buf{a}{\zap\vv}{\m}{b}{\ww}                                                                                 \\
-  & \rrule{E-TryInRaise}     &~ \run{E}{\tryin{\run{P}{\rraise}}{x}{M}{N}}                                     &~ \rightarrow \run{E}{\zap P~;~N}                                                                                                         \\
-  & \rrule{E-Raise}          &~ \run{P}{\rraise}                                                               &~ \rightarrow \zap P                                                                                                                      \\
-  & \rrule{E-LiftC}          &~ \run{\G}{\C}                                                                   &~ \rightarrow \run{\G}{\D}, \quad \text{if}~\C \rightarrow \D
-\end{align*}
-
-\textbf{Zap Reduction} \hfill \fbox{$C \zaparrow D$}
-\begin{align*}
-  & \rrule{E-ZapLin}         &~ \buf{a}{\zap\vv}{\lin}{b}{\ww}                                             &~ \zaparrow \buf{a}{\empt}{\lin}{b}{\ww \cdot \zap}          \\
-  & \rrule{E-ZapUn}          &~ \buf{a}{\zap\vv}{\un}{b}{\ww}                                              &~ \zaparrow \buf{a}{\vv}{\un}{b}{\ww}                        \\
-  & \rrule{E-ReceiveZap}     &~ \run{E}{\receive_\lin~a}~||~\buf{a}{\zap}{\lin}{b}{\ww}                    &~ \zaparrow \run{E}{\rraise}~||~\buf{a}{\empt}{\lin}{b}{\ww} \\
-  & \rrule{E-ReceiveTypeZap} &~ \run{E}{\receiveType~a}~||~\buf{a}{\zap}{\lin}{b}{\ww}                     &~ \zaparrow \run{E}{\rraise}~||~\buf{a}{\empt}{\lin}{b}{\ww} \\
-  & \rrule{E-WaitZap}        &~ \run{E}{\wait~a}~||~\buf{a}{\zap}{\lin}{b}{\ww}                            &~ \zaparrow \run{E}{\rraise}~||~\buf{a}{\empt}{\lin}{b}{\ww} \\
-  & \rrule{E-CaseZap}        &~ \run{E}{\caseLabel{i}{n}{\lin}{\lbl}{a}{M}}~||~\buf{a}{\zap}{\lin}{b}{\ww} &~ \zaparrow \run{E}{\rraise}~||~\buf{a}{\empt}{\lin}{b}{\ww} \\
+  & \rrule{E-Channel} \quad\quad\quad \lefteqn{\run{E}{\channel~@\T}                                                          \rightarrow (va)(vb)(\run{E}{(a,b)}~||~\buf{a}{\empt}{\text{mult}(\text{kind}(\T))}{b}{\empt}), \quad \text{where}~a,b~\text{are fresh}} \\
+  & \rrule{E-Fork}           &~ \run{E}{\fork~(\lambda x.M)}                                                               &~ \rightarrow \run{E}{()}~||~M\{()/x\}                                                                                                     \\
+  & \rrule{E-Send}           &~ \run{E}{\send~V~a}~||~\buf{a}{\vv}{\m}{b}{\ww}                                             &~ \rightarrow \run{E}{a}~||~\buf{a}{\vv}{\m}{b}{\ww \cdot V}                                                                               \\
+  & \rrule{E-Receive}        &~ \run{E}{\receive~a}~||~\buf{a}{V \cdot \vv}{\m}{b}{\ww}                                    &~ \rightarrow \run{E}{(V,a)}~||~\buf{a}{\vv}{\m}{b}{\ww}                                                                                   \\
+  & \rrule{E-SendType}       &~ \run{E}{\sendType~@\T~a}~||~\buf{a}{\vv}{\m}{b}{\ww}                                       &~ \rightarrow \run{E}{a}~||~\buf{a}{\vv}{\m}{b}{\ww \cdot @\T}                                                                             \\
+  & \rrule{E-ReceiveType}    &~ \run{E}{\receiveType~a}~||~\buf{a}{@\T \cdot \vv}{\m}{b}{\ww}                              &~ \rightarrow \run{E}{(@\T,a)}~||~\buf{a}{\vv}{\m}{b}{\ww}                                                                                 \\
+  & \rrule{E-Close}          &~ \run{E}{\close~a}~||~\buf{a}{\vv}{\m}{b}{\ww}                                              &~ \rightarrow \run{E}{()}~||~\buf{a}{\vv}{\m}{b}{\ww \cdot \eos}                                                                           \\
+  & \rrule{E-Wait}           &~ (va)(vb)(\run{E}{\wait~a}~||~\buf{a}{\eos}{\m}{b}{\empt})                                  &~ \rightarrow \run{E}{()}                                                                                                                  \\
+  & \rrule{E-Select}         &~ \run{E}{\select~\lbl~a}~||~\buf{a}{\vv}{\m}{b}{\ww}                                        &~ \rightarrow \run{E}{a}~||~\buf{a}{\vv}{\m}{b}{\ww \cdot \lbl}                                                                            \\
+  & \rrule{E-Case} \qquad\qquad\quad~ \lefteqn{\run{E}{\caseLabel{i}{n}{\lbl}{a}{M}}~||~\buf{a}{\lbl_j \cdot \vv}{\m}{b}{\ww} \rightarrow \run{E}{M_j\{a/a_j\}}~||~\buf{a}{\vv}{\m}{b}{\ww}}                                                                           \\
+  & \rrule{E-Cancel}         &~ \run{E}{\cancel~a}~||~\buf{a}{\vv}{\m}{b}{\ww}                                             &~ \rightarrow \run{E}{\zap a}~||~\buf{a}{\vv}{\m}{b}{\ww}                                                                                  \\
+  & \rrule{E-ZapLin}         &~ \run{E}{\zap a}~||~\buf{a}{\vv}{\lin}{b}{\ww}                                              &~ \rightarrow \run{E}{\zap\vv}~||~\buf{a}{\empt}{\lin}{b}{\ww \cdot \zap}                                                                  \\
+  & \rrule{E-ZapUn}          &~ \run{E}{\zap a}~||~\buf{a}{\vv}{\un}{b}{\ww}                                               &~ \rightarrow \run{E}{()}~||~\buf{a}{\vv}{\un}{b}{\ww}                                                                                     \\
+  & \rrule{E-ReceiveZap}     &~ \run{E}{\receive~a}~||~\buf{a}{\zap}{\m}{b}{\ww}                                           &~ \rightarrow \run{E}{\rraise}~||~\buf{a}{\empt}{\m}{b}{\ww}                                                                               \\
+  & \rrule{E-ReceiveTypeZap} &~ \run{E}{\receiveType~a}~||~\buf{a}{\zap}{\m}{b}{\ww}                                       &~ \rightarrow \run{E}{\rraise}~||~\buf{a}{\empt}{\m}{b}{\ww}                                                                               \\
+  & \rrule{E-WaitZap}        &~ \run{E}{\wait~a}~||~\buf{a}{\zap}{\m}{b}{\ww}                                              &~ \rightarrow \run{E}{\rraise}~||~\buf{a}{\empt}{\m}{b}{\ww}                                                                               \\
+  & \rrule{E-CaseZap}        &~ \run{E}{\caseLabel{i}{n}{\lbl}{a}{M}}~||~\buf{a}{\zap}{\m}{b}{\ww}                         &~ \rightarrow \run{E}{\rraise}~||~\buf{a}{\empt}{\m}{b}{\ww}                                                                               \\
+  & \rrule{E-TryInRaise}     &~ \run{E}{\tryin{\run{P}{\rraise}}{x}{M}{N}}                                                 &~ \rightarrow \run{E}{\zap P~;~N}                                                                                                          \\
+  & \rrule{E-Raise}          &~ \run{P}{\rraise}                                                                           &~ \rightarrow \zap P                                                                                                                       \\
+  & \rrule{E-LiftC}          &~ \run{\G}{\C}                                                                               &~ \rightarrow \run{\G}{\D}, \quad \text{if}~\C \rightarrow \D
 \end{align*}
 
 \textbf{Syntactic Sugar}
 \begin{align*}
-  && \zap \vv & \sugar \zap U_1 \cdots \zap U_n && \text{where}~\vv = U_1 \cdots U_n \\
-  && \zap U   & \sugar \zap a_i                 && \forall a_i \in \fn(U)            \\
-  && \zap P   & \sugar \zap a_i                 && \forall a_i \in \fn(P)            \\
+  && M~;~N    & \sugar \lett{()}{M}{N}                                                            \\
+  && \zap \vv & \sugar \zap V_1 \cdots \zap V_n     && \text{where}~\vv = V_1 \cdots V_n          \\
+  && \zap V   & \sugar \zap a_1~;~\ldots~;~\zap a_n && \text{where}~\{a_1,~\ldots,~a_n\} = \fn(V) \\
+  && \zap P   & \sugar \zap a_1~;~\ldots~;~\zap a_n && \text{where}~\{a_1,~\ldots,~a_n\} = \fn(P)
 \end{align*}
 
 \section{Some Thoughts about Shared Channel Cancellation}
