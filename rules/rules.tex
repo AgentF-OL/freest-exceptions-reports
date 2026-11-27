@@ -264,7 +264,7 @@ $(va)(vb)(\buf{a}{\empt}{\m}{b}{\empt})~||~\C~\eq~\C$
 \textbf{Syntactic Sugar}
 \begin{align*}
   && M~;~N    & \sugar \lett{()}{M}{N}                                                            \\
-  && \zap \vv & \sugar \zap V_1 \cdots \zap V_n     && \text{where}~\vv = V_1 \cdots V_n          \\
+  && \zap \vv & \sugar \zap V_1~;~\ldots~;~\zap V_n && \text{where}~\vv = V_1 \cdots V_n          \\
   && \zap V   & \sugar \zap a_1~;~\ldots~;~\zap a_n && \text{where}~\{a_1,~\ldots,~a_n\} = \fn(V) \\
   && \zap P   & \sugar \zap a_1~;~\ldots~;~\zap a_n && \text{where}~\{a_1,~\ldots,~a_n\} = \fn(P)
 \end{align*}
